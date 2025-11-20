@@ -1,0 +1,503 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import Header from '../components/Header.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import logoImage from '../assets/logo.png';
+
+// Get latest 3 blog posts
+const posts = (await getCollection('blog'))
+	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+	.slice(0, 3);
+---
+
+<!doctype html>
+<html lang="zh">
+	<head>
+		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+		<style>
+			.hero {
+				max-width: 900px;
+				margin: 0 auto;
+				padding: 2rem 1rem 1.75rem;
+				text-align: center;
+				background: linear-gradient(180deg, rgba(59, 130, 246, 0.05) 0%, rgba(34, 197, 94, 0.05) 100%);
+				border-radius: 18px;
+			}
+
+			.hero-logo {
+				width: 80px;
+				height: 80px;
+				margin: 0 auto 1.25rem;
+				border-radius: 50%;
+				object-fit: cover;
+				object-position: center;
+				background: transparent;
+				box-shadow: 
+					0 0 15px rgba(59, 130, 246, 0.2),
+					0 0 30px rgba(34, 197, 94, 0.12),
+					0 5px 15px rgba(0, 0, 0, 0.06);
+				transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+				animation: float 6s ease-in-out infinite;
+				position: relative;
+				display: block;
+				overflow: hidden;
+				transform: scale(1.5);
+			}
+
+			.hero-logo:hover {
+				transform: scale(1.55) rotate(5deg);
+				box-shadow: 
+					0 0 25px rgba(59, 130, 246, 0.35),
+					0 0 45px rgba(34, 197, 94, 0.2),
+					0 8px 25px rgba(0, 0, 0, 0.1);
+			}
+
+			@keyframes float {
+				0%, 100% {
+					transform: scale(1.5) translateY(0px) rotate(0deg);
+				}
+				25% {
+					transform: scale(1.5) translateY(-10px) rotate(2deg);
+				}
+				50% {
+					transform: scale(1.5) translateY(-5px) rotate(0deg);
+				}
+				75% {
+					transform: scale(1.5) translateY(-10px) rotate(-2deg);
+				}
+			}
+
+			.hero-title {
+				font-size: 1.75rem;
+				font-weight: 700;
+				background: linear-gradient(135deg, #2563eb 0%, #22c55e 100%);
+				-webkit-background-clip: text;
+				-webkit-text-fill-color: transparent;
+				background-clip: text;
+				margin-bottom: 0.5rem;
+				animation: fadeInUp 0.8s ease-out;
+				letter-spacing: -0.02em;
+			}
+
+			.hero-subtitle {
+				font-size: 0.95rem;
+				color: rgb(var(--gray));
+				margin-bottom: 1rem;
+				animation: fadeInUp 1s ease-out;
+				font-weight: 500;
+			}
+
+			.hero-description {
+				font-size: 0.875rem;
+				color: rgb(var(--gray-dark));
+				max-width: 600px;
+				margin: 0 auto 1.25rem;
+				line-height: 1.6;
+				animation: fadeInUp 1.2s ease-out;
+			}
+
+			@keyframes fadeInUp {
+				from {
+					opacity: 0;
+					transform: translateY(20px);
+				}
+				to {
+					opacity: 1;
+					transform: translateY(0);
+				}
+			}
+
+			.hero-buttons {
+				display: flex;
+				gap: 1rem;
+				justify-content: center;
+				flex-wrap: wrap;
+				animation: fadeInUp 1.4s ease-out;
+			}
+
+			.btn {
+				padding: 0.65rem 1.5rem;
+				border-radius: 8px;
+				text-decoration: none;
+				font-weight: 600;
+				font-size: 0.9rem;
+				transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+				display: inline-block;
+				position: relative;
+				overflow: hidden;
+			}
+
+			.btn::before {
+				content: '';
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 100%);
+				opacity: 0;
+				transition: opacity 0.3s ease;
+			}
+
+			.btn:hover::before {
+				opacity: 1;
+			}
+
+			.btn-primary {
+				background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+				color: white;
+				box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+			}
+
+			.btn-primary:hover {
+				transform: translateY(-3px);
+				box-shadow: 0 6px 25px rgba(37, 99, 235, 0.5);
+			}
+
+			.btn-secondary {
+				background: white;
+				color: #2563eb;
+				border: 2px solid #2563eb;
+				box-shadow: 0 4px 15px rgba(37, 99, 235, 0.1);
+			}
+
+			.btn-secondary:hover {
+				background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+				color: white;
+				transform: translateY(-3px);
+				box-shadow: 0 6px 25px rgba(37, 99, 235, 0.3);
+			}
+
+			.about-section {
+				max-width: 800px;
+				margin: 2.25rem auto;
+				padding: 0 1rem;
+			}
+
+			.about-content {
+				background: white;
+				padding: 1.75rem;
+				border-radius: 12px;
+				border: 1px solid rgb(var(--gray-light));
+				box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
+			}
+
+			.about-text p {
+				font-size: 0.9rem;
+				line-height: 1.6;
+				color: rgb(var(--gray-dark));
+				margin-bottom: 0.875rem;
+			}
+
+			.about-skills {
+				margin-top: 1.5rem;
+			}
+
+			.about-skills h3 {
+				font-size: 1rem;
+				font-weight: 700;
+				color: rgb(var(--black));
+				margin-bottom: 0.75rem;
+			}
+
+			.skills-tags {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.6rem;
+			}
+
+			.skill-tag {
+				padding: 0.4rem 1rem;
+				background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+				color: white;
+				border-radius: 18px;
+				font-size: 0.875rem;
+				font-weight: 500;
+				transition: all 0.3s ease;
+			}
+
+			.skill-tag:hover {
+				transform: translateY(-2px);
+				box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+			}
+
+			.recent-posts {
+				max-width: 1000px;
+				margin: 2.25rem auto;
+				padding: 0 1rem;
+			}
+
+			.section-title {
+				font-size: 1.4rem;
+				font-weight: 700;
+				color: rgb(var(--black));
+				margin-bottom: 1.35rem;
+				text-align: center;
+				letter-spacing: -0.01em;
+			}
+
+			.posts-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+				gap: 1.15rem;
+			}
+
+			.post-card {
+				background: white;
+				border: 1px solid rgb(var(--gray-light));
+				border-radius: 10px;
+				overflow: hidden;
+				transition: all 0.3s ease;
+			}
+
+			.post-card:hover {
+				transform: translateY(-3px);
+				box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+			}
+
+			.post-image {
+				width: 100%;
+				height: 160px;
+				object-fit: cover;
+			}
+
+			.post-content {
+				padding: 1rem 1.25rem;
+			}
+
+			.post-date {
+				color: rgb(var(--gray));
+				font-size: 0.8rem;
+				margin-bottom: 0.35rem;
+			}
+
+			.post-title {
+				font-size: 1.05rem;
+				font-weight: 600;
+				color: rgb(var(--black));
+				margin-bottom: 0.45rem;
+				line-height: 1.4;
+			}
+
+			.post-title a {
+				color: inherit;
+				text-decoration: none;
+				transition: color 0.2s ease;
+			}
+
+			.post-title a:hover {
+				color: var(--accent);
+			}
+
+			.post-description {
+				color: rgb(var(--gray-dark));
+				line-height: 1.55;
+				margin-bottom: 0.75rem;
+				font-size: 0.875rem;
+			}
+
+			.post-tags {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.35rem;
+			}
+
+			.tag {
+				padding: 0.2rem 0.6rem;
+				background: rgb(var(--gray-light));
+				color: var(--accent);
+				border-radius: 4px;
+				font-size: 0.75rem;
+			}
+
+			@media (max-width: 768px) {
+				.hero {
+					padding: 1.75rem 1rem;
+				}
+
+				.hero-logo {
+					width: 65px;
+					height: 65px;
+					margin-bottom: 1rem;
+				}
+
+				.hero-title {
+					font-size: 1.5rem;
+				}
+
+				.hero-subtitle {
+					font-size: 0.9rem;
+				}
+
+				.hero-description {
+					font-size: 0.85rem;
+					margin-bottom: 1rem;
+				}
+
+				.btn {
+					padding: 0.6rem 1.35rem;
+					font-size: 0.875rem;
+				}
+
+				.about-section {
+					margin: 1.85rem auto;
+				}
+
+				.about-content {
+					padding: 1.5rem 1.25rem;
+				}
+
+				.about-text p {
+					font-size: 0.875rem;
+				}
+
+				.recent-posts {
+					margin: 1.85rem auto;
+				}
+
+				.section-title {
+					font-size: 1.25rem;
+					margin-bottom: 1.15rem;
+				}
+
+				.posts-grid {
+					grid-template-columns: 1fr;
+					gap: 0.95rem;
+				}
+
+				.post-image {
+					height: 145px;
+				}
+			}
+
+			@media (max-width: 480px) {
+				.hero {
+					padding: 1.5rem 1rem;
+				}
+
+				.hero-logo {
+					width: 60px;
+					height: 60px;
+				}
+
+				.hero-title {
+					font-size: 1.4rem;
+				}
+
+				.hero-subtitle {
+					font-size: 0.875rem;
+				}
+
+				.hero-description {
+					font-size: 0.825rem;
+				}
+
+				.about-content {
+					padding: 1.35rem 1rem;
+				}
+
+				.section-title {
+					font-size: 1.2rem;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<Header />
+		<main>
+			<!-- Hero Section -->
+			<section class="hero">
+				<Image
+					src={logoImage}
+					alt="Dashi Logo"
+					width={1200}
+					height={1200}
+					class="hero-logo"
+				/>
+				<h1 class="hero-title">欢迎来到 Dashi Blog</h1>
+				<p class="hero-subtitle">探索技术之路 · 追寻星辰大海</p>
+				<p class="hero-description">
+					这里记录我的技术学习之路，包括软件开发、系统架构、算法研究等内容。
+					希望通过分享知识和经验，与大家一起进步，如同攀登山峰，步步向上，永不止息。
+				</p>
+				<div class="hero-buttons">
+					<a href="/blog" class="btn btn-primary">浏览博客</a>
+					<a href="/projects" class="btn btn-secondary">查看项目</a>
+				</div>
+			</section>
+
+			<!-- About Me Section -->
+			<section class="about-section">
+				<h2 class="section-title">About Me</h2>
+				<div class="about-content">
+					<div class="about-text">
+						<p>
+							你好！我是一名充满热情的开发者，专注于探索技术的无限可能。就像logo中的山峰和星辰一样，
+							我相信技术之路虽然充满挑战，但每一步攀登都会带来新的视野。
+						</p>
+						<p>
+							在这个博客里，我会分享我在软件开发、系统架构、算法研究等领域的学习心得和实践经验。
+							希望能与同样热爱技术的你，一起在这条充满惊喜的道路上不断前行。
+						</p>
+						<div class="about-skills">
+							<h3>技术栈</h3>
+							<div class="skills-tags">
+								<span class="skill-tag">JavaScript</span>
+								<span class="skill-tag">TypeScript</span>
+								<span class="skill-tag">React</span>
+								<span class="skill-tag">Node.js</span>
+								<span class="skill-tag">Python</span>
+								<span class="skill-tag">Astro</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Recent Posts Section -->
+			{
+				posts.length > 0 && (
+					<section class="recent-posts">
+						<h2 class="section-title">最新文章</h2>
+						<div class="posts-grid">
+							{posts.map((post) => (
+								<article class="post-card">
+									{post.data.heroImage && (
+										<Image
+											src={post.data.heroImage}
+											alt={post.data.title}
+											width={400}
+											height={200}
+											class="post-image"
+										/>
+									)}
+									<div class="post-content">
+										<div class="post-date">
+											<FormattedDate date={post.data.pubDate} />
+										</div>
+										<h3 class="post-title">
+											<a href={`/blog/${post.id}/`}>{post.data.title}</a>
+										</h3>
+										<p class="post-description">{post.data.description}</p>
+										{post.data.tags && post.data.tags.length > 0 && (
+											<div class="post-tags">
+												{post.data.tags.map((tag) => (
+													<span class="tag">{tag}</span>
+												))}
+											</div>
+										)}
+									</div>
+								</article>
+							))}
+						</div>
+					</section>
+				)
+			}
+		</main>
+		<Footer />
+	</body>
+</html>

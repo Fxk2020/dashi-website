@@ -1,0 +1,178 @@
+---
+// Theme picker component for switching between different color schemes
+---
+
+<div class="theme-picker">
+	<button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+		<span class="theme-icon">🎨</span>
+	</button>
+	<div id="theme-menu" class="theme-menu hidden">
+		<button class="theme-option" data-theme="light">
+			<span class="theme-preview light-preview"></span>
+			<span>浅色 Light</span>
+		</button>
+		<button class="theme-option" data-theme="dark">
+			<span class="theme-preview dark-preview"></span>
+			<span>深色 Dark</span>
+		</button>
+		<button class="theme-option" data-theme="blue">
+			<span class="theme-preview blue-preview"></span>
+			<span>海洋 Ocean</span>
+		</button>
+		<button class="theme-option" data-theme="green">
+			<span class="theme-preview green-preview"></span>
+			<span>森林 Forest</span>
+		</button>
+		<button class="theme-option" data-theme="purple">
+			<span class="theme-preview purple-preview"></span>
+			<span>紫罗兰 Violet</span>
+		</button>
+	</div>
+</div>
+
+<style>
+	.theme-picker {
+		position: relative;
+		display: inline-block;
+	}
+
+	.theme-toggle {
+		background: white;
+		border: 1px solid rgb(var(--gray-light));
+		border-radius: 4px;
+		padding: 0.5rem;
+		cursor: pointer;
+		font-size: 1.2rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: all 0.2s ease;
+	}
+
+	.theme-toggle:hover {
+		border-color: var(--accent);
+		transform: scale(1.05);
+	}
+
+	.theme-menu {
+		position: absolute;
+		top: calc(100% + 0.5rem);
+		right: 0;
+		background: white;
+		border: 1px solid rgb(var(--gray-light));
+		border-radius: 8px;
+		padding: 0.5rem;
+		min-width: 180px;
+		box-shadow: 0 4px 12px rgba(var(--gray), 20%);
+		z-index: 1000;
+	}
+
+	.theme-menu.hidden {
+		display: none;
+	}
+
+	.theme-option {
+		width: 100%;
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 0.75rem;
+		border: none;
+		background: transparent;
+		cursor: pointer;
+		border-radius: 4px;
+		font-family: "Atkinson", sans-serif;
+		font-size: 0.9rem;
+		transition: background 0.2s ease;
+	}
+
+	.theme-option:hover {
+		background: rgb(var(--gray-light));
+	}
+
+	.theme-option.active {
+		background: var(--accent);
+		color: white;
+	}
+
+	.theme-preview {
+		width: 24px;
+		height: 24px;
+		border-radius: 50%;
+		border: 2px solid rgb(var(--gray-light));
+	}
+
+	.light-preview {
+		background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+	}
+
+	.dark-preview {
+		background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+	}
+
+	.blue-preview {
+		background: linear-gradient(135deg, #3182ce 0%, #2c5282 100%);
+	}
+
+	.green-preview {
+		background: linear-gradient(135deg, #38a169 0%, #276749 100%);
+	}
+
+	.purple-preview {
+		background: linear-gradient(135deg, #805ad5 0%, #553c9a 100%);
+	}
+</style>
+
+<script>
+	const themeToggle = document.getElementById('theme-toggle');
+	const themeMenu = document.getElementById('theme-menu');
+	const themeOptions = document.querySelectorAll('.theme-option');
+
+	// Load saved theme or default to light
+	const savedTheme = localStorage.getItem('theme') || 'light';
+	applyTheme(savedTheme);
+
+	// Toggle menu
+	themeToggle?.addEventListener('click', (e) => {
+		e.stopPropagation();
+		themeMenu?.classList.toggle('hidden');
+	});
+
+	// Close menu when clicking outside
+	document.addEventListener('click', () => {
+		themeMenu?.classList.add('hidden');
+	});
+
+	// Theme selection
+	themeOptions.forEach((option) => {
+		option.addEventListener('click', (e) => {
+			e.stopPropagation();
+			const theme = (option as HTMLElement).dataset.theme;
+			if (theme) {
+				applyTheme(theme);
+				localStorage.setItem('theme', theme);
+				themeMenu?.classList.add('hidden');
+			}
+		});
+
+		// Mark active theme
+		if ((option as HTMLElement).dataset.theme === savedTheme) {
+			option.classList.add('active');
+		}
+	});
+
+	function applyTheme(theme: string) {
+		document.documentElement.setAttribute('data-theme', theme);
+		
+		// Update active state
+		themeOptions.forEach((option) => {
+			if ((option as HTMLElement).dataset.theme === theme) {
+				option.classList.add('active');
+			} else {
+				option.classList.remove('active');
+			}
+		});
+	}
+</script>
+
+

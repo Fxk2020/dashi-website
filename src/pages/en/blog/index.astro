@@ -1,0 +1,340 @@
+---
+import { getCollection } from 'astro:content';
+import BaseHead from '../../../components/BaseHead.astro';
+import Footer from '../../../components/Footer.astro';
+import FormattedDate from '../../../components/FormattedDate.astro';
+import Header from '../../../components/Header.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../../../consts';
+
+const posts = (await getCollection('blog')).sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+
+// Group posts by year
+const postsByYear: Record<number, typeof posts> = {};
+posts.forEach((post) => {
+	const year = post.data.pubDate.getFullYear();
+	if (!postsByYear[year]) {
+		postsByYear[year] = [];
+	}
+	postsByYear[year].push(post);
+});
+
+// Get all unique tags with counts
+const tagCounts: Record<string, number> = {};
+posts.forEach((post) => {
+	post.data.tags?.forEach((tag) => {
+		tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+	});
+});
+
+const sortedTags = Object.entries(tagCounts).sort((a, b) => b[1] - a[1]);
+const years = Object.keys(postsByYear).sort((a, b) => Number(b) - Number(a));
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={`Blog - ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
+		<style>
+			.blog-container {
+				max-width: 1200px;
+				margin: 0 auto;
+				padding: 2rem 1rem;
+				display: grid;
+				grid-template-columns: 1fr 300px;
+				gap: 3rem;
+			}
+
+			.blog-main {
+				min-width: 0;
+			}
+
+			.search-box {
+				width: 100%;
+				padding: 0.75rem 1rem;
+				font-size: 1rem;
+				border: 2px solid rgb(var(--gray-light));
+				border-radius: 8px;
+				margin-bottom: 2rem;
+				font-family: "Atkinson", sans-serif;
+			}
+
+			.search-box:focus {
+				outline: none;
+				border-color: var(--accent);
+			}
+
+			.year-section {
+				margin-bottom: 3rem;
+			}
+
+			.year-title {
+				font-size: 2rem;
+				color: rgb(var(--black));
+				margin-bottom: 1.5rem;
+				padding-bottom: 0.5rem;
+				border-bottom: 2px solid rgb(var(--gray-light));
+			}
+
+			.post-list {
+				list-style: none;
+				padding: 0;
+				margin: 0;
+			}
+
+			.post-item {
+				margin-bottom: 1.5rem;
+				padding-bottom: 1.5rem;
+				border-bottom: 1px solid rgb(var(--gray-light));
+			}
+
+			.post-item:last-child {
+				border-bottom: none;
+			}
+
+			.post-date {
+				color: rgb(var(--gray));
+				font-size: 0.9rem;
+				margin-bottom: 0.5rem;
+			}
+
+			.post-title {
+				font-size: 1.25rem;
+				margin: 0.5rem 0;
+			}
+
+			.post-title a {
+				color: rgb(var(--black));
+				text-decoration: none;
+				transition: color 0.2s ease;
+			}
+
+			.post-title a:hover {
+				color: var(--accent);
+			}
+
+			.post-tags {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.5rem;
+				margin-top: 0.5rem;
+			}
+
+			.tag {
+				display: inline-block;
+				padding: 0.25rem 0.75rem;
+				background: rgb(var(--gray-light));
+				color: var(--accent);
+				border-radius: 4px;
+				font-size: 0.85rem;
+				text-decoration: none;
+				transition: all 0.2s ease;
+				cursor: pointer;
+			}
+
+			.tag:hover {
+				background: var(--accent);
+				color: white;
+			}
+
+			.sidebar {
+				position: sticky;
+				top: 2rem;
+				height: fit-content;
+			}
+
+			.sidebar-section {
+				margin-bottom: 2rem;
+			}
+
+			.sidebar-title {
+				font-size: 1.5rem;
+				color: rgb(var(--black));
+				margin-bottom: 1rem;
+			}
+
+			.tag-cloud {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.5rem;
+			}
+
+			.tag-cloud-item {
+				display: flex;
+				flex-direction: column;
+				align-items: flex-start;
+			}
+
+			.tag-cloud-name {
+				color: rgb(var(--gray-dark));
+				font-size: 0.9rem;
+			}
+
+			.tag-cloud-count {
+				color: rgb(var(--gray));
+				font-size: 0.8rem;
+			}
+
+			.hidden {
+				display: none !important;
+			}
+
+			@media (max-width: 900px) {
+				.blog-container {
+					grid-template-columns: 1fr;
+				}
+
+				.sidebar {
+					position: static;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<Header />
+		<div class="blog-container">
+			<main class="blog-main">
+				<input
+					type="text"
+					id="search"
+					class="search-box"
+					placeholder="Search blog posts..."
+				/>
+
+				<div id="posts-container">
+					{
+						years.map((year) => (
+							<section class="year-section" data-year={year}>
+								<h2 class="year-title">{year}</h2>
+								<ul class="post-list">
+									{postsByYear[Number(year)].map((post) => (
+										<li class="post-item" data-tags={JSON.stringify(post.data.tags || [])} data-title={post.data.title.toLowerCase()} data-description={post.data.description.toLowerCase()}>
+											<div class="post-date">
+												<FormattedDate date={post.data.pubDate} />
+											</div>
+											<h3 class="post-title">
+												<a href={`/en/blog/${post.id}/`}>{post.data.title}</a>
+											</h3>
+											{post.data.tags && post.data.tags.length > 0 && (
+												<div class="post-tags">
+													{post.data.tags.map((tag) => (
+														<span class="tag" data-tag={tag}>
+															{tag}
+														</span>
+													))}
+												</div>
+											)}
+										</li>
+									))}
+								</ul>
+							</section>
+						))
+					}
+				</div>
+			</main>
+
+			<aside class="sidebar">
+				<div class="sidebar-section">
+					<h3 class="sidebar-title">All Tags</h3>
+					<div class="tag-cloud">
+						{
+							sortedTags.map(([tag, count]) => (
+								<div class="tag-cloud-item">
+									<span class="tag" data-tag={tag}>
+										<span class="tag-cloud-name">{tag}</span> <span class="tag-cloud-count">({count})</span>
+									</span>
+								</div>
+							))
+						}
+					</div>
+				</div>
+			</aside>
+		</div>
+		<Footer />
+
+		<script>
+			let selectedTag: string | null = null;
+
+			// Search functionality
+			const searchInput = document.getElementById('search') as HTMLInputElement;
+			const postsContainer = document.getElementById('posts-container');
+
+			function filterPosts() {
+				const searchTerm = searchInput.value.toLowerCase();
+				const postItems = document.querySelectorAll('.post-item');
+				const yearSections = document.querySelectorAll('.year-section');
+
+				postItems.forEach((item) => {
+					const title = (item as HTMLElement).dataset.title || '';
+					const description = (item as HTMLElement).dataset.description || '';
+					const tags = JSON.parse((item as HTMLElement).dataset.tags || '[]');
+
+					const matchesSearch =
+						searchTerm === '' ||
+						title.includes(searchTerm) ||
+						description.includes(searchTerm) ||
+						tags.some((tag: string) => tag.toLowerCase().includes(searchTerm));
+
+					const matchesTag =
+						selectedTag === null || tags.includes(selectedTag);
+
+					if (matchesSearch && matchesTag) {
+						(item as HTMLElement).classList.remove('hidden');
+					} else {
+						(item as HTMLElement).classList.add('hidden');
+					}
+				});
+
+				// Hide empty year sections
+				yearSections.forEach((section) => {
+					const visiblePosts = section.querySelectorAll('.post-item:not(.hidden)');
+					if (visiblePosts.length === 0) {
+						(section as HTMLElement).classList.add('hidden');
+					} else {
+						(section as HTMLElement).classList.remove('hidden');
+					}
+				});
+			}
+
+			searchInput?.addEventListener('input', filterPosts);
+
+			// Tag filtering
+			const tagElements = document.querySelectorAll('.tag');
+			tagElements.forEach((tagEl) => {
+				tagEl.addEventListener('click', () => {
+					const tag = (tagEl as HTMLElement).dataset.tag;
+					if (selectedTag === tag) {
+						// Deselect tag
+						selectedTag = null;
+						tagElements.forEach((el) => el.classList.remove('active'));
+					} else {
+						// Select tag
+						selectedTag = tag || null;
+						tagElements.forEach((el) => {
+							if ((el as HTMLElement).dataset.tag === tag) {
+								el.classList.add('active');
+							} else {
+								el.classList.remove('active');
+							}
+						});
+					}
+					filterPosts();
+				});
+			});
+		</script>
+
+		<style is:global>
+			.tag.active {
+				background: var(--accent) !important;
+				color: white !important;
+			}
+
+			.tag.active .tag-cloud-count {
+				color: rgba(255, 255, 255, 0.8) !important;
+			}
+		</style>
+	</body>
+</html>
+
+

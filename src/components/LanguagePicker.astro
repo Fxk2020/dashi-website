@@ -1,0 +1,64 @@
+---
+import { languages } from '../i18n';
+
+const currentLang = Astro.currentLocale || 'zh';
+---
+
+<div class="language-picker">
+	<select id="language-select" class="language-select">
+		{
+			Object.entries(languages).map(([lang, label]) => (
+				<option value={lang} selected={lang === currentLang}>
+					{label}
+				</option>
+			))
+		}
+	</select>
+</div>
+
+<style>
+	.language-picker {
+		display: inline-block;
+	}
+
+	.language-select {
+		padding: 0.5rem;
+		border: 1px solid rgb(var(--gray-light));
+		border-radius: 4px;
+		background: white;
+		color: rgb(var(--gray-dark));
+		font-family: "Atkinson", sans-serif;
+		cursor: pointer;
+		font-size: 0.9rem;
+	}
+
+	.language-select:hover {
+		border-color: var(--accent);
+	}
+
+	.language-select:focus {
+		outline: none;
+		border-color: var(--accent);
+	}
+</style>
+
+<script>
+	const languageSelect = document.getElementById('language-select') as HTMLSelectElement;
+	
+	languageSelect?.addEventListener('change', (e) => {
+		const newLang = (e.target as HTMLSelectElement).value;
+		const currentPath = window.location.pathname;
+		
+		// Remove current language prefix if exists
+		const pathWithoutLang = currentPath.replace(/^\/(en|zh)/, '');
+		
+		// Redirect to new language
+		if (newLang === 'zh') {
+			window.location.pathname = pathWithoutLang || '/';
+		} else {
+			window.location.pathname = `/${newLang}${pathWithoutLang}`;
+		}
+	});
+</script>
+
+
