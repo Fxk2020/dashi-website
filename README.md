@@ -6,7 +6,7 @@
 ![Astro](https://img.shields.io/badge/Astro-5.15.5-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
-[中文文档](./README_ZH.md) | English
+[中文文档](./README.md) | [English](./README_EN.md)
 
 ---
 
