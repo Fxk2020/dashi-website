@@ -1,0 +1,567 @@
+---
+import { getCollection } from 'astro:content';
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import { SITE_TITLE } from '../consts';
+
+// 获取经验分享文章
+const experiencePosts = (await getCollection('experience')).sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+
+// 获取旅行记录
+const travelPosts = (await getCollection('travel'));
+
+// 学术论文数据 - 外部链接
+const papers = [
+	{
+		title: 'To Store or Not: Online Cost Optimization for Running Big Data Jobs on the Cloud',
+		description: '为了降低云端大数据分析的成本，本文提出了确定性和随机性两种在线算法来动态决策中间数据的存储，并通过理论分析与真实负载实验验证了其显著的成本节约效果。',
+		date: ' July 2024',
+		journal: 'Future Generation Computer Systems',
+		link: 'https://www.sciencedirect.com/science/article/abs/pii/S0167739X24000803',
+		tags: ['在线算法 (Online Algorithms)', '成本优化 (Cost Optimization)','hadoop'],
+	},
+	{
+		title: 'A DRL-based real-time video processing framework in cloud-edge syste',
+		description: '为了解决实时视频分析中的延迟与算力限制问题，本文提出了一个名为DeepVA的云边协同框架，通过基于深度强化学习的算法动态决策视频帧的处理位置，从而显著降低了延迟并提升了分析准确率。',
+		date: 'August 2024',
+		journal: 'IEEE Internet of Things Journal',
+		link: 'https://ieeexplore.ieee.org/abstract/document/10659097',
+		tags: ['云边协同 (Cloud-Edge Collaboration)', '视频分析 (Video Analytics)', '深度强化学习 (Deep Reinforcement Learning)'],
+	},
+	{
+		title: 'Caching or Re-Computing: Online Cost Optimization for Running Big Data Tasks in IaaS Cloud',
+		description: '针对云环境下大数据任务中间结果缓存面临的成本权衡与未来需求不可知挑战，本文提出了确定性和随机性两种在线算法，在无需预知未来信息的情况下动态制定缓存决策，并从理论上证明了其竞争比性能，从而有效降低了总成本。',
+		date: 'March 2025',
+		journal: 'Journal of Network and Computer Applications',
+		link: 'https://www.sciencedirect.com/science/article/abs/pii/S1084804524002571',
+		tags: ['在线算法 (Online Algorithms)', '成本优化 (Cost Optimization)','hadoop'],
+	},
+];
+---
+
+<!doctype html>
+<html lang="zh">
+	<head>
+		<BaseHead title={`生活·分享 - ${SITE_TITLE}`} description="记录生活、分享经验、展示作品" />
+		<style>
+			main {
+				width: 100%;
+				max-width: 1200px;
+				margin: 0 auto;
+				padding: 2rem 1rem;
+			}
+
+			.page-header {
+				text-align: center;
+				margin-bottom: 3rem;
+			}
+
+			.page-title {
+				font-size: 2.5rem;
+				font-weight: 700;
+				background: linear-gradient(135deg, #2563eb 0%, #22c55e 100%);
+				-webkit-background-clip: text;
+				-webkit-text-fill-color: transparent;
+				background-clip: text;
+				margin-bottom: 0.75rem;
+			}
+
+			.page-subtitle {
+				font-size: 1.1rem;
+				color: rgb(var(--gray));
+			}
+
+			.section {
+				margin-bottom: 4rem;
+			}
+
+			.section-header {
+				display: flex;
+				align-items: center;
+				gap: 0.75rem;
+				margin-bottom: 2rem;
+				padding-bottom: 0.75rem;
+				border-bottom: 2px solid rgb(var(--gray-light));
+			}
+
+			.section-icon {
+				font-size: 1.8rem;
+			}
+
+			.section-title {
+				font-size: 1.8rem;
+				font-weight: 700;
+				color: rgb(var(--black));
+			}
+
+			.section-count {
+				font-size: 1rem;
+				color: rgb(var(--gray));
+				margin-left: 0.5rem;
+			}
+
+			/* 卡片网格 */
+			.cards-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+				gap: 1.5rem;
+			}
+
+			.card {
+				background: white;
+				border: 1px solid rgb(var(--gray-light));
+				border-radius: 12px;
+				padding: 1.5rem;
+				transition: all 0.3s ease;
+				cursor: pointer;
+				text-decoration: none;
+				color: inherit;
+				position: relative;
+			}
+
+			.card:hover {
+				transform: translateY(-4px);
+				box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+				border-color: var(--accent);
+			}
+
+			.card-category-badge {
+				display: inline-block;
+				padding: 0.4rem 0.8rem;
+				background: linear-gradient(135deg, #2563eb 0%, #22c55e 100%);
+				color: white;
+				border-radius: 6px;
+				font-size: 0.75rem;
+				font-weight: 600;
+				margin-bottom: 0.75rem;
+			}
+
+			.card-header {
+				display: flex;
+				justify-content: space-between;
+				align-items: start;
+				margin-bottom: 0.75rem;
+			}
+
+			.card-title {
+				font-size: 1.2rem;
+				font-weight: 600;
+				color: rgb(var(--black));
+				margin-bottom: 0.5rem;
+				line-height: 1.4;
+			}
+
+			.card-date {
+				font-size: 0.85rem;
+				color: rgb(var(--gray));
+				white-space: nowrap;
+			}
+
+			.card-description {
+				font-size: 0.95rem;
+				color: rgb(var(--gray-dark));
+				line-height: 1.6;
+				margin-bottom: 1rem;
+			}
+
+			.card-footer {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.5rem;
+				margin-top: 1rem;
+			}
+
+			.tag {
+				display: inline-block;
+				padding: 0.25rem 0.6rem;
+				background: rgba(37, 99, 235, 0.08);
+				color: #2563eb;
+				border-radius: 4px;
+				font-size: 0.75rem;
+				font-weight: 500;
+			}
+
+			/* 旅行足迹网格 */
+			.travel-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+				gap: 2rem;
+			}
+
+			.travel-card {
+				background: white;
+				border: 1px solid rgb(var(--gray-light));
+				border-radius: 16px;
+				overflow: hidden;
+				transition: all 0.3s ease;
+				cursor: pointer;
+				text-decoration: none;
+				color: inherit;
+			}
+
+			.travel-card:hover {
+				transform: translateY(-6px);
+				box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+				border-color: var(--accent);
+			}
+
+			.travel-background {
+				height: 220px;
+				background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				position: relative;
+				overflow: hidden;
+			}
+
+			/* 不同卡片不同渐变色 */
+			.travel-background[data-index="0"] {
+				background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			}
+
+			.travel-background[data-index="1"] {
+				background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+			}
+
+			.travel-background[data-index="2"] {
+				background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+			}
+
+			.travel-background[data-index="3"] {
+				background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+			}
+
+			.travel-background::before {
+				content: '';
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background: radial-gradient(circle at 30% 50%, rgba(255,255,255,0.15) 0%, transparent 60%);
+			}
+
+			.travel-icon {
+				font-size: 4rem;
+				position: relative;
+				z-index: 1;
+				animation: float 3s ease-in-out infinite;
+			}
+
+			@keyframes float {
+				0%, 100% { transform: translateY(0); }
+				50% { transform: translateY(-10px); }
+			}
+
+			.travel-info {
+				padding: 1.5rem;
+			}
+
+			.travel-card-title {
+				font-size: 1.5rem;
+				font-weight: 700;
+				color: rgb(var(--black));
+				margin-bottom: 0.75rem;
+			}
+
+			.travel-card-meta {
+				display: flex;
+				gap: 1rem;
+				margin-bottom: 1rem;
+				font-size: 0.85rem;
+				color: rgb(var(--gray));
+				flex-wrap: wrap;
+			}
+
+			.travel-card-description {
+				font-size: 0.95rem;
+				color: rgb(var(--gray-dark));
+				line-height: 1.6;
+				margin-bottom: 1rem;
+			}
+
+			.travel-highlights {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.5rem;
+			}
+
+			.highlight-badge {
+				padding: 0.3rem 0.7rem;
+				background: rgba(37, 99, 235, 0.08);
+				color: #2563eb;
+				border-radius: 4px;
+				font-size: 0.75rem;
+				font-weight: 500;
+			}
+
+			/* 学术论文列表 */
+			.papers-list {
+				display: flex;
+				flex-direction: column;
+				gap: 1.5rem;
+			}
+
+			.paper-card {
+				background: white;
+				border: 1px solid rgb(var(--gray-light));
+				border-radius: 12px;
+				padding: 1.75rem;
+				transition: all 0.3s ease;
+				text-decoration: none;
+				color: inherit;
+			}
+
+			.paper-card:hover {
+				transform: translateX(8px);
+				box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+				border-color: var(--accent);
+			}
+
+			.paper-header {
+				margin-bottom: 1rem;
+			}
+
+			.paper-title-section {
+				display: flex;
+				align-items: start;
+				gap: 0.75rem;
+				margin-bottom: 0.5rem;
+			}
+
+			.paper-title {
+				font-size: 1.3rem;
+				font-weight: 600;
+				color: rgb(var(--black));
+				line-height: 1.4;
+				flex: 1;
+			}
+
+			.external-link-icon {
+				font-size: 1.2rem;
+				opacity: 0.6;
+				transition: all 0.3s ease;
+			}
+
+			.paper-card:hover .external-link-icon {
+				opacity: 1;
+				transform: translateX(3px) translateY(-3px);
+			}
+
+			.paper-journal {
+				display: inline-block;
+				font-size: 0.9rem;
+				color: var(--accent);
+				background: rgba(37, 99, 235, 0.08);
+				padding: 0.25rem 0.75rem;
+				border-radius: 4px;
+				font-weight: 500;
+			}
+
+			.paper-description {
+				font-size: 0.95rem;
+				color: rgb(var(--gray-dark));
+				line-height: 1.6;
+				margin-bottom: 1.25rem;
+			}
+
+			.paper-footer {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				flex-wrap: wrap;
+				gap: 1rem;
+			}
+
+			.paper-date {
+				font-size: 0.85rem;
+				color: rgb(var(--gray));
+			}
+
+			.paper-tags {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.5rem;
+			}
+
+			.paper-tag {
+				padding: 0.25rem 0.6rem;
+				background: rgb(var(--gray-light));
+				color: rgb(var(--gray-dark));
+				border-radius: 4px;
+				font-size: 0.75rem;
+			}
+
+			/* 响应式 */
+			@media (max-width: 768px) {
+				.page-title {
+					font-size: 2rem;
+				}
+
+				.section-title {
+					font-size: 1.5rem;
+				}
+
+				.cards-grid {
+					grid-template-columns: 1fr;
+					gap: 1rem;
+				}
+
+				.travel-grid {
+					grid-template-columns: 1fr;
+					gap: 1.5rem;
+				}
+
+				.travel-background {
+					height: 180px;
+				}
+
+				.travel-icon {
+					font-size: 3rem;
+				}
+
+				.travel-card-title {
+					font-size: 1.3rem;
+				}
+			}
+
+			@media (max-width: 480px) {
+				.page-header {
+					padding: 1rem 0;
+					margin-bottom: 2rem;
+				}
+
+				.page-title {
+					font-size: 1.75rem;
+				}
+
+				.travel-background {
+					height: 160px;
+				}
+
+				.travel-info {
+					padding: 1.25rem;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<Header />
+		<main>
+			<div class="page-header">
+				<h1 class="page-title">生活·分享</h1>
+				<p class="page-subtitle">记录生活点滴 | 分享技术经验 | 展示学术成果</p>
+			</div>
+
+			<!-- 经验分享区域 -->
+			<section class="section">
+				<div class="section-header">
+					<span class="section-icon">💡</span>
+					<h2 class="section-title">
+						经验分享
+						<span class="section-count">({experiencePosts.length})</span>
+					</h2>
+				</div>
+				<div class="cards-grid">
+					{experiencePosts.map((post) => (
+						<a href={`/experience/${post.id}/`} class="card">
+							{post.data.category && (
+								<div class="card-category-badge">{post.data.category}</div>
+							)}
+							<div class="card-header">
+								<h3 class="card-title">{post.data.title}</h3>
+								<span class="card-date">
+									<FormattedDate date={post.data.pubDate} />
+								</span>
+							</div>
+							<p class="card-description">{post.data.description}</p>
+							<div class="card-footer">
+								{post.data.tags && post.data.tags.slice(0, 3).map((tag) => (
+									<span class="tag">#{tag}</span>
+								))}
+							</div>
+						</a>
+					))}
+				</div>
+			</section>
+
+			<!-- 旅行足迹区域 -->
+			<section class="section">
+				<div class="section-header">
+					<span class="section-icon">📸</span>
+					<h2 class="section-title">
+						旅行足迹
+						<span class="section-count">({travelPosts.length})</span>
+					</h2>
+				</div>
+				<div class="travel-grid">
+					{travelPosts.map((travel, index) => (
+						<a href={`/travel/${travel.id}/`} class="travel-card">
+							<div class="travel-background" data-index={index}>
+								<div class="travel-icon">🏔️</div>
+							</div>
+							<div class="travel-info">
+								<h3 class="travel-card-title">{travel.data.title}</h3>
+								<div class="travel-card-meta">
+									<span class="location">📍 {travel.data.location}</span>
+									<span class="date">📅 {travel.data.date}</span>
+								</div>
+								<p class="travel-card-description">{travel.data.description}</p>
+								{travel.data.highlights && travel.data.highlights.length > 0 && (
+									<div class="travel-highlights">
+										{travel.data.highlights.slice(0, 3).map((highlight) => (
+											<span class="highlight-badge">{highlight}</span>
+										))}
+									</div>
+								)}
+							</div>
+						</a>
+					))}
+				</div>
+			</section>
+
+			<!-- 学术论文区域 - 外部链接 -->
+			<section class="section">
+				<div class="section-header">
+					<span class="section-icon">📄</span>
+					<h2 class="section-title">
+						学术论文
+						<span class="section-count">({papers.length})</span>
+					</h2>
+				</div>
+				<div class="papers-list">
+					{papers.map((paper) => (
+						<a href={paper.link} target="_blank" rel="noopener noreferrer" class="paper-card">
+							<div class="paper-header">
+								<div class="paper-title-section">
+									<h3 class="paper-title">{paper.title}</h3>
+									<span class="external-link-icon">🔗</span>
+								</div>
+								<span class="paper-journal">{paper.journal}</span>
+							</div>
+							<p class="paper-description">{paper.description}</p>
+							<div class="paper-footer">
+								<span class="paper-date">📅 {paper.date}</span>
+								<div class="paper-tags">
+									{paper.tags.map((tag) => (
+										<span class="paper-tag">{tag}</span>
+									))}
+								</div>
+							</div>
+						</a>
+					))}
+				</div>
+			</section>
+		</main>
+		<Footer />
+	</body>
+</html>
+
+
+
+

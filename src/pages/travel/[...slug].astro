@@ -1,0 +1,693 @@
+---
+import { getCollection, type CollectionEntry, render } from 'astro:content';
+import { Image } from 'astro:assets';
+import BaseHead from '../../components/BaseHead.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { SITE_TITLE } from '../../consts';
+
+export async function getStaticPaths() {
+	const travels = await getCollection('travel');
+	return travels.map((travel) => ({
+		params: { slug: travel.id },
+		props: travel,
+	}));
+}
+
+type Props = CollectionEntry<'travel'>;
+
+const travel = Astro.props;
+const { Content } = await render(travel);
+---
+
+<!doctype html>
+<html lang="zh">
+	<head>
+		<BaseHead title={`${travel.data.title} - ${SITE_TITLE}`} description={travel.data.description} />
+		<style>
+			.travel-hero {
+				position: relative;
+				height: 500px;
+				overflow: hidden;
+			}
+
+			.hero-image-wrapper {
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+			}
+
+			.hero-image {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+			}
+
+			.hero-overlay {
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background: linear-gradient(
+					to bottom,
+					rgba(0, 0, 0, 0.3) 0%,
+					rgba(0, 0, 0, 0.5) 100%
+				);
+			}
+
+			.hero-fallback {
+				width: 100%;
+				height: 100%;
+				background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				position: relative;
+			}
+
+			.hero-fallback::before {
+				content: '';
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background: radial-gradient(circle at 40% 40%, rgba(255,255,255,0.15) 0%, transparent 60%);
+			}
+
+			.hero-icon {
+				font-size: 6rem;
+				position: relative;
+				z-index: 1;
+				animation: float 3s ease-in-out infinite;
+			}
+
+			@keyframes float {
+				0%, 100% { transform: translateY(0); }
+				50% { transform: translateY(-15px); }
+			}
+
+			.hero-content {
+				position: absolute;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				padding: 3rem 2rem;
+				background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
+				color: white;
+				z-index: 2;
+			}
+
+			.hero-content-inner {
+				max-width: 1200px;
+				margin: 0 auto;
+			}
+
+			.travel-icon-badge {
+				display: inline-block;
+				font-size: 2rem;
+				margin-bottom: 1rem;
+				padding: 0.5rem 1rem;
+				background: rgba(255, 255, 255, 0.2);
+				backdrop-filter: blur(10px);
+				border-radius: 12px;
+			}
+
+			.travel-title {
+				font-size: 3.5rem;
+				font-weight: 800;
+				margin-bottom: 1rem;
+				text-shadow: 0 4px 20px rgba(0,0,0,0.4);
+			}
+
+			.travel-meta {
+				display: flex;
+				gap: 2rem;
+				font-size: 1.1rem;
+				margin-bottom: 1rem;
+				flex-wrap: wrap;
+			}
+
+			.meta-item {
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+				padding: 0.5rem 1rem;
+				background: rgba(255, 255, 255, 0.15);
+				backdrop-filter: blur(10px);
+				border-radius: 8px;
+			}
+
+			.travel-description {
+				font-size: 1.3rem;
+				max-width: 800px;
+				line-height: 1.6;
+				text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+			}
+
+			/* 信息卡片区域 */
+			.info-cards {
+				max-width: 1200px;
+				margin: -3rem auto 3rem;
+				padding: 0 2rem;
+				position: relative;
+				z-index: 3;
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+				gap: 1.5rem;
+			}
+
+			.info-card {
+				background: white;
+				padding: 1.5rem;
+				border-radius: 12px;
+				box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+				text-align: center;
+				transition: transform 0.3s ease;
+			}
+
+			.info-card:hover {
+				transform: translateY(-4px);
+			}
+
+			.info-card-icon {
+				font-size: 2rem;
+				margin-bottom: 0.5rem;
+			}
+
+			.info-card-label {
+				font-size: 0.9rem;
+				color: rgb(var(--gray));
+				margin-bottom: 0.5rem;
+			}
+
+			.info-card-value {
+				font-size: 1.2rem;
+				font-weight: 700;
+				color: rgb(var(--black));
+			}
+
+			/* 亮点标签栏 */
+			.highlights-bar {
+				background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(34, 197, 94, 0.05) 100%);
+				padding: 2rem;
+				border-top: 1px solid rgb(var(--gray-light));
+				border-bottom: 1px solid rgb(var(--gray-light));
+			}
+
+			.highlights-container {
+				max-width: 1200px;
+				margin: 0 auto;
+				padding: 0 2rem;
+			}
+
+			.highlights-title {
+				font-size: 1.3rem;
+				font-weight: 700;
+				color: rgb(var(--black));
+				margin-bottom: 1rem;
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+			}
+
+			.highlights-grid {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 1rem;
+			}
+
+			.highlight-tag {
+				padding: 0.75rem 1.5rem;
+				background: white;
+				border: 2px solid rgba(37, 99, 235, 0.2);
+				border-radius: 25px;
+				color: #2563eb;
+				font-size: 1rem;
+				font-weight: 600;
+				transition: all 0.3s ease;
+				box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+			}
+
+			.highlight-tag:hover {
+				transform: translateY(-2px);
+				box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+				background: rgba(37, 99, 235, 0.05);
+			}
+
+			/* 主内容区域 */
+			.main-content {
+				max-width: 1200px;
+				margin: 0 auto;
+				padding: 3rem 2rem;
+			}
+
+			.content-grid {
+				display: grid;
+				grid-template-columns: 1fr 300px;
+				gap: 3rem;
+			}
+
+			.travel-article {
+				font-size: 1.1rem;
+				line-height: 1.9;
+				color: rgb(var(--gray-dark));
+			}
+
+			.travel-article :global(h2) {
+				font-size: 2.2rem;
+				font-weight: 700;
+				margin-top: 3rem;
+				margin-bottom: 1.5rem;
+				color: rgb(var(--black));
+				padding-bottom: 0.75rem;
+				border-bottom: 3px solid var(--accent);
+				display: flex;
+				align-items: center;
+				gap: 0.75rem;
+			}
+
+			.travel-article :global(h2::before) {
+				content: '📍';
+				font-size: 1.8rem;
+			}
+
+			.travel-article :global(h3) {
+				font-size: 1.7rem;
+				font-weight: 600;
+				margin-top: 2.5rem;
+				margin-bottom: 1.2rem;
+				color: rgb(var(--black));
+			}
+
+			.travel-article :global(h4) {
+				font-size: 1.3rem;
+				font-weight: 600;
+				margin-top: 2rem;
+				margin-bottom: 1rem;
+				color: rgb(var(--gray-dark));
+			}
+
+			.travel-article :global(p) {
+				margin-bottom: 1.5rem;
+			}
+
+			.travel-article :global(ul),
+			.travel-article :global(ol) {
+				margin-bottom: 1.8rem;
+				padding-left: 2rem;
+			}
+
+			.travel-article :global(li) {
+				margin-bottom: 1rem;
+			}
+
+			.travel-article :global(strong) {
+				color: rgb(var(--black));
+				font-weight: 700;
+			}
+
+			.travel-article :global(blockquote) {
+				border-left: 5px solid var(--accent);
+				padding: 1.5rem 2rem;
+				margin: 2.5rem 0;
+				background: rgba(37, 99, 235, 0.05);
+				border-radius: 8px;
+				font-style: italic;
+				color: rgb(var(--gray-dark));
+				font-size: 1.05rem;
+			}
+
+			.travel-article :global(img) {
+				max-width: 100%;
+				border-radius: 16px;
+				margin: 2.5rem 0;
+				box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+			}
+
+			/* 侧边栏 */
+			.sidebar {
+				position: sticky;
+				top: 100px;
+				height: fit-content;
+			}
+
+			.sidebar-card {
+				background: white;
+				border: 1px solid rgb(var(--gray-light));
+				border-radius: 12px;
+				padding: 1.5rem;
+				margin-bottom: 1.5rem;
+				box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+			}
+
+			.sidebar-title {
+				font-size: 1.1rem;
+				font-weight: 700;
+				color: rgb(var(--black));
+				margin-bottom: 1rem;
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+			}
+
+			.sidebar-list {
+				list-style: none;
+				padding: 0;
+			}
+
+			.sidebar-list li {
+				padding: 0.75rem 0;
+				border-bottom: 1px solid rgb(var(--gray-light));
+			}
+
+			.sidebar-list li:last-child {
+				border-bottom: none;
+			}
+
+			.sidebar-list li strong {
+				color: rgb(var(--black));
+				font-weight: 600;
+			}
+
+			/* 照片集区域 */
+			.photo-gallery {
+				margin: 4rem 0;
+			}
+
+			.gallery-title {
+				font-size: 2rem;
+				font-weight: 700;
+				color: rgb(var(--black));
+				margin-bottom: 2rem;
+				text-align: center;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				gap: 0.75rem;
+			}
+
+			.gallery-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+				gap: 1.5rem;
+			}
+
+			.gallery-item {
+				position: relative;
+				overflow: hidden;
+				border-radius: 16px;
+				box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+				transition: all 0.3s ease;
+				cursor: pointer;
+			}
+
+			.gallery-item:hover {
+				transform: translateY(-8px);
+				box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+			}
+
+			.gallery-item img {
+				width: 100%;
+				height: 300px;
+				object-fit: cover;
+				transition: transform 0.3s ease;
+			}
+
+			.gallery-item:hover img {
+				transform: scale(1.1);
+			}
+
+			/* 返回按钮 */
+			.back-link {
+				max-width: 1200px;
+				margin: 2rem auto 0;
+				padding: 0 2rem;
+			}
+
+			.back-link a {
+				display: inline-flex;
+				align-items: center;
+				gap: 0.75rem;
+				padding: 1rem 2rem;
+				background: white;
+				color: var(--accent);
+				font-weight: 600;
+				text-decoration: none;
+				border-radius: 12px;
+				box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+				transition: all 0.3s ease;
+				border: 2px solid rgba(37, 99, 235, 0.2);
+			}
+
+			.back-link a:hover {
+				transform: translateX(-4px);
+				box-shadow: 0 4px 16px rgba(37, 99, 235, 0.2);
+				background: rgba(37, 99, 235, 0.05);
+			}
+
+			/* 响应式 */
+			@media (max-width: 1024px) {
+				.content-grid {
+					grid-template-columns: 1fr;
+				}
+
+				.sidebar {
+					position: relative;
+					top: 0;
+				}
+			}
+
+			@media (max-width: 768px) {
+				.travel-hero {
+					height: 350px;
+				}
+
+				.travel-title {
+					font-size: 2.2rem;
+				}
+
+				.travel-meta {
+					flex-direction: column;
+					gap: 0.75rem;
+				}
+
+				.travel-description {
+					font-size: 1.1rem;
+				}
+
+				.info-cards {
+					grid-template-columns: 1fr;
+					margin: -2rem auto 2rem;
+					padding: 0 1rem;
+				}
+
+				.main-content {
+					padding: 2rem 1rem;
+				}
+
+				.travel-article {
+					font-size: 1rem;
+				}
+
+				.travel-article :global(h2) {
+					font-size: 1.8rem;
+				}
+
+				.travel-article :global(h3) {
+					font-size: 1.4rem;
+				}
+
+				.gallery-grid {
+					grid-template-columns: 1fr;
+				}
+
+				.gallery-item img {
+					height: 250px;
+				}
+			}
+
+			@media (max-width: 480px) {
+				.travel-hero {
+					height: 300px;
+				}
+
+				.hero-content {
+					padding: 2rem 1rem;
+				}
+
+				.travel-icon-badge {
+					font-size: 1.5rem;
+				}
+
+				.travel-title {
+					font-size: 1.8rem;
+				}
+
+				.highlights-bar {
+					padding: 1.5rem 1rem;
+				}
+
+				.highlights-container {
+					padding: 0;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<Header />
+		<main>
+			<div class="back-link">
+				<a href="/gallery">← 返回生活·分享</a>
+			</div>
+
+			<article>
+				<!-- 英雄区域 -->
+				<section class="travel-hero">
+					{travel.data.heroImage ? (
+						<div class="hero-image-wrapper">
+							<Image 
+								src={travel.data.heroImage} 
+								alt={travel.data.title}
+								class="hero-image"
+								width={1920}
+								height={500}
+							/>
+							<div class="hero-overlay"></div>
+						</div>
+					) : (
+						<div class="hero-fallback">
+							<div class="hero-icon">🏔️</div>
+						</div>
+					)}
+					
+					<div class="hero-content">
+						<div class="hero-content-inner">
+							<div class="travel-icon-badge">🗺️</div>
+							<h1 class="travel-title">{travel.data.title}</h1>
+							<div class="travel-meta">
+								<span class="meta-item">
+									📍 {travel.data.location}
+								</span>
+								<span class="meta-item">
+									 {travel.data.date}
+								</span>
+								{travel.data.duration && (
+									<span class="meta-item">
+										⏱️ {travel.data.duration}
+									</span>
+								)}
+							</div>
+							<p class="travel-description">{travel.data.description}</p>
+						</div>
+					</div>
+				</section>
+
+				<!-- 信息卡片 -->
+				{(travel.data.bestSeason || travel.data.budget || travel.data.duration) && (
+					<div class="info-cards">
+						{travel.data.duration && (
+							<div class="info-card">
+								<div class="info-card-icon">⏱️</div>
+								<div class="info-card-label">旅行时长</div>
+								<div class="info-card-value">{travel.data.duration}</div>
+							</div>
+						)}
+						{travel.data.bestSeason && (
+							<div class="info-card">
+								<div class="info-card-icon">🌤️</div>
+								<div class="info-card-label">最佳季节</div>
+								<div class="info-card-value">{travel.data.bestSeason}</div>
+							</div>
+						)}
+						{travel.data.budget && (
+							<div class="info-card">
+								<div class="info-card-icon">💰</div>
+								<div class="info-card-label">预算参考</div>
+								<div class="info-card-value">{travel.data.budget}</div>
+							</div>
+						)}
+					</div>
+				)}
+
+				<!-- 精彩亮点 -->
+				{travel.data.highlights && travel.data.highlights.length > 0 && (
+					<section class="highlights-bar">
+						<div class="highlights-container">
+							<h2 class="highlights-title">✨ 精彩亮点</h2>
+							<div class="highlights-grid">
+								{travel.data.highlights.map((highlight) => (
+									<span class="highlight-tag">{highlight}</span>
+								))}
+							</div>
+						</div>
+					</section>
+				)}
+
+				<!-- 主内容区域 -->
+				<div class="main-content">
+					<div class="content-grid">
+						<!-- 文章内容 -->
+						<div class="travel-article">
+							<Content />
+
+							<!-- 照片集 -->
+							{travel.data.images && travel.data.images.length > 0 && (
+								<div class="photo-gallery">
+									<h2 class="gallery-title">📸 旅行照片集</h2>
+									<div class="gallery-grid">
+										{travel.data.images.map((image, index) => (
+											<div class="gallery-item">
+												<Image 
+													src={image} 
+													alt={`${travel.data.title} - 照片 ${index + 1}`}
+													width={600}
+													height={400}
+												/>
+											</div>
+										))}
+									</div>
+								</div>
+							)}
+						</div>
+
+						<!-- 侧边栏 -->
+						<aside class="sidebar">
+							<div class="sidebar-card">
+								<h3 class="sidebar-title">📋 旅行信息</h3>
+								<ul class="sidebar-list">
+									<li><strong>目的地：</strong>{travel.data.location}</li>
+									<li><strong>时间：</strong>{travel.data.date}</li>
+									{travel.data.duration && (
+										<li><strong>时长：</strong>{travel.data.duration}</li>
+									)}
+									{travel.data.bestSeason && (
+										<li><strong>最佳季节：</strong>{travel.data.bestSeason}</li>
+									)}
+									{travel.data.budget && (
+										<li><strong>预算：</strong>{travel.data.budget}</li>
+									)}
+								</ul>
+							</div>
+
+							{travel.data.highlights && travel.data.highlights.length > 0 && (
+								<div class="sidebar-card">
+									<h3 class="sidebar-title">⭐ 必游景点</h3>
+									<ul class="sidebar-list">
+										{travel.data.highlights.map((highlight) => (
+											<li>· {highlight}</li>
+										))}
+									</ul>
+								</div>
+							)}
+						</aside>
+					</div>
+				</div>
+			</article>
+		</main>
+		<Footer />
+	</body>
+</html>
