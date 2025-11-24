@@ -13,6 +13,7 @@
 ## 📖 目录
 
 - [特性](#-特性)
+- [部署到ECS并绑定域名](#-部署到ECS并绑定域名)
 - [快速开始](#-快速开始)
 - [项目结构](#-项目结构)
 - [设计说明](#-设计说明)
@@ -45,6 +46,91 @@
 - 🎯 **SEO优化** - 完整的 meta 标签和站点地图
 
 ---
+
+## 部署到ECS并绑定域名
+### 1.部署到ECS（阿里云ALinux系统）
+#### 1.1 环境准备
+在开始之前
+1. **更新系统：**
+
+   ```bash
+   sudo yum update -y
+   ```
+
+2. **安装 Nginx (作为 Web 服务器或反向代理)：**
+
+   ```bash
+   sudo yum install epel-release -y
+   sudo yum install nginx -y
+   sudo systemctl start nginx
+   sudo systemctl enable nginx
+   ```
+---
+#### 1.2 部署静态站点
+这是 Astro 的默认模式 (`output: 'static'`)。这种方式最简单，性能最好。
+
+##### 本地构建
+
+在你的开发电脑上运行：
+
+```bash
+npm run build
+```
+
+这会在你的项目根目录下生成一个 `dist/` 文件夹。
+
+##### 上传文件到服务器
+
+使用 `scp` 或 FTP 工具（如 FileZilla）将 `dist` 文件夹内的**所有内容**上传到服务器。
+
+假设上传路径为 `/var/www/my-astro-site`：
+
+```bash
+# 在本地终端执行 (示例)
+scp -r dist/* root@你的服务器IP:/var/www/my-astro-site
+```
+
+*注意：请确保服务器上 `/var/www/my-astro-site` 目录存在且 Nginx 有权限读取。*
+
+##### 配置 Nginx
+
+编辑 Nginx 配置文件：
+
+```bash
+sudo vi /etc/nginx/conf.d/astro.conf
+```
+
+写入以下内容：
+
+```nginx
+server {
+    listen 80;
+    server_name your_domain.com; # 替换为你的域名或IP
+
+    root /var/www/my-astro-site; # 你的上传目录
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # 可选：开启 gzip 压缩
+    gzip on;
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
+}
+```
+
+##### 重启 Nginx
+
+```bash
+sudo nginx -t # 检查配置是否正确
+sudo systemctl restart nginx
+```
+
+---
+
+### 2.绑定域名
+参考阿里云[添加网站解析](https://help.aliyun.com/zh/dns/pubz-add-website-parsing)和[购买与绑定域名](https://help.aliyun.com/zh/dns/pubz-instance-purchase-and-domain-name-binding)绑定域名并对域名解析加速。
 
 ## 🚀 快速开始
 
