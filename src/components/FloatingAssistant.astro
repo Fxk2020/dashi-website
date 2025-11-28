@@ -1,0 +1,169 @@
+---
+import { Image } from 'astro:assets';
+import cozeLogo from '../assets/coze-copy.svg';
+---
+
+<a 
+  href="https://www.coze.cn/store/agent/7577214573053902854?bot_id=true&bid=6iaac433g1g1v" 
+  target="_blank"
+  class="floating-assistant"
+  title="我是顾城的南明史博士，帮你了解那段历史"
+  aria-label="AI小助手"
+>
+  <div class="assistant-inner">
+    <Image src={cozeLogo} alt="AI助手" width={32} height={32} class="assistant-icon" />
+  </div>
+  <span class="assistant-tooltip">我是顾城的南明史博士，帮你了解那段历史</span>
+</a>
+
+<style>
+  .floating-assistant {
+    position: fixed !important;
+    bottom: 24px !important;
+    right: 24px !important;
+    width: 56px !important;
+    height: 56px !important;
+    border-radius: 50% !important;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%) !important;
+    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3), 0 2px 8px rgba(139, 92, 246, 0.2) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    z-index: 9999 !important;
+    text-decoration: none !important;
+    animation: float 4s ease-in-out infinite !important;
+    border: 2px solid rgba(255, 255, 255, 0.2) !important;
+    backdrop-filter: blur(8px) !important;
+  }
+
+  .floating-assistant:hover {
+    transform: scale(1.15) !important;
+    box-shadow: 0 8px 28px rgba(99, 102, 241, 0.5), 0 4px 16px rgba(139, 92, 246, 0.3) !important;
+    border-color: rgba(255, 255, 255, 0.4) !important;
+  }
+
+  .assistant-inner {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+  }
+
+  .assistant-icon {
+    width: 32px !important;
+    height: 32px !important;
+    filter: brightness(0) invert(1) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .floating-assistant:hover .assistant-icon {
+    transform: scale(1.15) rotate(15deg);
+  }
+
+  .assistant-tooltip {
+    position: absolute;
+    right: 68px;
+    top: 50%;
+    transform: translateY(-50%) scale(0.95);
+    background: linear-gradient(135deg, rgba(30, 30, 40, 0.95) 0%, rgba(40, 40, 50, 0.95) 100%);
+    color: white;
+    padding: 12px 18px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25), 0 2px 8px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(12px);
+    letter-spacing: 0.3px;
+  }
+
+  .assistant-tooltip::after {
+    content: '';
+    position: absolute;
+    right: -7px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-left: 8px solid rgba(35, 35, 45, 0.95);
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    filter: drop-shadow(2px 0 2px rgba(0, 0, 0, 0.1));
+  }
+
+  .floating-assistant:hover .assistant-tooltip {
+    opacity: 1;
+    visibility: visible;
+    right: 72px;
+    transform: translateY(-50%) scale(1);
+  }
+
+  /* 悬浮动画 - 更柔和 */
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+      box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3), 0 2px 8px rgba(139, 92, 246, 0.2);
+    }
+    50% {
+      transform: translateY(-8px);
+      box-shadow: 0 8px 20px rgba(99, 102, 241, 0.35), 0 4px 12px rgba(139, 92, 246, 0.25);
+    }
+  }
+
+  /* 响应式设计 */
+  @media (max-width: 768px) {
+    .floating-assistant {
+      bottom: 20px !important;
+      right: 20px !important;
+      width: 52px !important;
+      height: 52px !important;
+    }
+
+    .assistant-icon {
+      width: 28px !important;
+      height: 28px !important;
+    }
+
+    .assistant-tooltip {
+      font-size: 12px;
+      padding: 10px 14px;
+      right: 64px;
+      max-width: 220px;
+    }
+
+    .floating-assistant:hover .assistant-tooltip {
+      right: 68px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .floating-assistant {
+      bottom: 16px !important;
+      right: 16px !important;
+      width: 48px !important;
+      height: 48px !important;
+    }
+
+    .assistant-icon {
+      width: 26px !important;
+      height: 26px !important;
+    }
+
+    .assistant-tooltip {
+      max-width: 180px;
+      white-space: normal;
+      line-height: 1.5;
+      font-size: 11px;
+    }
+  }
+</style>
+

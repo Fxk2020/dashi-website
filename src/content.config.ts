@@ -51,4 +51,24 @@ const travel = defineCollection({
 		}),
 });
 
-export const collections = { blog, experience, travel };
+const books = defineCollection({
+	// Load Markdown and MDX files in the `src/content/books/` directory.
+	loader: glob({ base: './src/content/books', pattern: '**/*.{md,mdx}' }),
+	schema: ({ image }) =>
+		z.object({
+			title: z.string(), // 书名
+			author: z.string(), // 作者
+			publisher: z.string().optional(), // 出版社
+			pubYear: z.string().optional(), // 出版年份
+			coverImage: image().optional(), // 封面图片
+			rating: z.number().min(0).max(5).optional(), // 评分（0-5）
+			readDate: z.coerce.date(), // 阅读日期
+			tags: z.array(z.string()).optional(), // 标签（如：小说、技术、历史等）
+			category: z.string().optional(), // 分类
+			status: z.enum(['reading', 'finished', 'abandoned']).optional(), // 阅读状态
+			summary: z.string(), // 简短总结
+			thoughts: z.string(), // 读后感想（在列表页展示）
+		}),
+});
+
+export const collections = { blog, experience, travel, books };

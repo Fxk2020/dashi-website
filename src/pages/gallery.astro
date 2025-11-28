@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import FloatingAssistant from '../components/FloatingAssistant.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import { SITE_TITLE } from '../consts';
 
@@ -14,31 +15,21 @@ const experiencePosts = (await getCollection('experience')).sort(
 // 获取旅行记录
 const travelPosts = (await getCollection('travel'));
 
-// 学术论文数据 - 外部链接
-const papers = [
+// 外部优秀内容
+const externalBlogs = [
 	{
-		title: 'To Store or Not: Online Cost Optimization for Running Big Data Jobs on the Cloud',
-		description: '为了降低云端大数据分析的成本，本文提出了确定性和随机性两种在线算法来动态决策中间数据的存储，并通过理论分析与真实负载实验验证了其显著的成本节约效果。',
-		date: ' July 2024',
-		journal: 'Future Generation Computer Systems',
-		link: 'https://www.sciencedirect.com/science/article/abs/pii/S0167739X24000803',
-		tags: ['在线算法 (Online Algorithms)', '成本优化 (Cost Optimization)','hadoop'],
+		title: 'Machine Learning Crash Course',
+		description: "Google's fast-paced, practical introduction to machine learning, featuring a series of animated videos, interactive visualizations, and hands-on practice exercises.",
+		url: 'https://developers.google.cn/machine-learning/crash-course/prereqs-and-prework?hl=zh-cn',
+		platform: 'GOOGLE',
+		date: 'Nov 2025',
 	},
 	{
-		title: 'A DRL-based real-time video processing framework in cloud-edge syste',
-		description: '为了解决实时视频分析中的延迟与算力限制问题，本文提出了一个名为DeepVA的云边协同框架，通过基于深度强化学习的算法动态决策视频帧的处理位置，从而显著降低了延迟并提升了分析准确率。',
-		date: 'August 2024',
-		journal: 'IEEE Internet of Things Journal',
-		link: 'https://ieeexplore.ieee.org/abstract/document/10659097',
-		tags: ['云边协同 (Cloud-Edge Collaboration)', '视频分析 (Video Analytics)', '深度强化学习 (Deep Reinforcement Learning)'],
-	},
-	{
-		title: 'Caching or Re-Computing: Online Cost Optimization for Running Big Data Tasks in IaaS Cloud',
-		description: '针对云环境下大数据任务中间结果缓存面临的成本权衡与未来需求不可知挑战，本文提出了确定性和随机性两种在线算法，在无需预知未来信息的情况下动态制定缓存决策，并从理论上证明了其竞争比性能，从而有效降低了总成本。',
-		date: 'March 2025',
-		journal: 'Journal of Network and Computer Applications',
-		link: 'https://www.sciencedirect.com/science/article/abs/pii/S1084804524002571',
-		tags: ['在线算法 (Online Algorithms)', '成本优化 (Cost Optimization)','hadoop'],
+		title: 'Prompt Engineering Guide',
+		description: 'Prompt engineering is the essential discipline of crafting, optimizing, and leveraging prompts—plus related techniques and tools—to safely and effectively harness large language models for everything from question answering and reasoning to domain augmentation and external integrations.',
+		url: 'https://www.promptingguide.ai/zh',
+		platform: 'DAIR.AI',
+		date: 'Nov 2025',
 	},
 ];
 ---
@@ -140,25 +131,20 @@ const papers = [
 				margin-bottom: 0.75rem;
 			}
 
-			.card-header {
-				display: flex;
-				justify-content: space-between;
-				align-items: start;
-				margin-bottom: 0.75rem;
-			}
-
 			.card-title {
 				font-size: 1.2rem;
 				font-weight: 600;
 				color: rgb(var(--black));
 				margin-bottom: 0.5rem;
 				line-height: 1.4;
+				display: block;
 			}
 
 			.card-date {
+				display: block;
 				font-size: 0.85rem;
 				color: rgb(var(--gray));
-				white-space: nowrap;
+				margin-bottom: 1rem;
 			}
 
 			.card-description {
@@ -455,7 +441,7 @@ const papers = [
 		<main>
 			<div class="page-header">
 				<h1 class="page-title">生活·分享</h1>
-				<p class="page-subtitle">记录生活点滴 | 分享技术经验 | 展示学术成果</p>
+				<p class="page-subtitle">记录生活点滴 | 分享技术经验 | 推荐优质内容</p>
 			</div>
 
 			<!-- 经验分享区域 -->
@@ -473,12 +459,10 @@ const papers = [
 							{post.data.category && (
 								<div class="card-category-badge">{post.data.category}</div>
 							)}
-							<div class="card-header">
-								<h3 class="card-title">{post.data.title}</h3>
-								<span class="card-date">
-									<FormattedDate date={post.data.pubDate} />
-								</span>
-							</div>
+							<h3 class="card-title">{post.data.title}</h3>
+							<span class="card-date">
+								<FormattedDate date={post.data.pubDate} />
+							</span>
 							<p class="card-description">{post.data.description}</p>
 							<div class="card-footer">
 								{post.data.tags && post.data.tags.slice(0, 3).map((tag) => (
@@ -525,33 +509,28 @@ const papers = [
 				</div>
 			</section>
 
-			<!-- 学术论文区域 - 外部链接 -->
+			<!-- 外部优秀内容区域 -->
 			<section class="section">
 				<div class="section-header">
-					<span class="section-icon">📄</span>
+					<span class="section-icon">🌟</span>
 					<h2 class="section-title">
-						学术论文
-						<span class="section-count">({papers.length})</span>
+						外部优秀内容
+						<span class="section-count">({externalBlogs.length})</span>
 					</h2>
 				</div>
 				<div class="papers-list">
-					{papers.map((paper) => (
-						<a href={paper.link} target="_blank" rel="noopener noreferrer" class="paper-card">
+					{externalBlogs.map((blog) => (
+						<a href={blog.url} target="_blank" rel="noopener noreferrer" class="paper-card">
 							<div class="paper-header">
 								<div class="paper-title-section">
-									<h3 class="paper-title">{paper.title}</h3>
+									<h3 class="paper-title">{blog.title}</h3>
 									<span class="external-link-icon">🔗</span>
 								</div>
-								<span class="paper-journal">{paper.journal}</span>
+								<span class="paper-journal">{blog.platform}</span>
 							</div>
-							<p class="paper-description">{paper.description}</p>
+							<p class="paper-description">{blog.description}</p>
 							<div class="paper-footer">
-								<span class="paper-date">📅 {paper.date}</span>
-								<div class="paper-tags">
-									{paper.tags.map((tag) => (
-										<span class="paper-tag">{tag}</span>
-									))}
-								</div>
+								<span class="paper-date">📅 {blog.date}</span>
 							</div>
 						</a>
 					))}
@@ -559,6 +538,7 @@ const papers = [
 			</section>
 		</main>
 		<Footer />
+		<FloatingAssistant />
 	</body>
 </html>
 

@@ -24,4 +24,6 @@ pnpm-debug.log*
 .idea/
 
 # assets files
-src/assets/
+src/assets/*
+# but keep logos-out directory
+!src/assets/logos-out/

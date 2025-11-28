@@ -27,6 +27,7 @@
 ## ✨ 特性
 
 ### 核心功能
+
 - 📝 **博客系统** - Markdown/MDX 支持，按年份分组
 - 🔍 **实时搜索** - 标题、描述、标签全文搜索
 - 🏷️ **标签云** - 智能标签过滤和分类
@@ -34,12 +35,14 @@
 - 👤 **About Me** - 个人介绍和技能展示
 
 ### 国际化与主题
+
 - 🌍 **双语支持** - 中文/英文完整本地化
 - 🎨 **5种主题** - Light、Dark、Ocean、Forest、Violet
 - 📱 **响应式设计** - 完美适配桌面、平板、手机
 - 🎭 **流畅动画** - 精心设计的过渡效果和交互动画
 
 ### 性能优化
+
 - ⚡ **静态生成** - Astro SSG，极致性能
 - 🖼️ **图片优化** - 自动优化和懒加载
 - 🔄 **粘性导航** - 毛玻璃效果的固定导航栏
@@ -48,15 +51,18 @@
 ---
 
 ## 部署到ECS并绑定域名
+
 ### 1.部署到ECS（阿里云ALinux系统）
+
 #### 1.1 环境准备
+
 在开始之前
+
 1. **更新系统：**
 
    ```bash
    sudo yum update -y
    ```
-
 2. **安装 Nginx (作为 Web 服务器或反向代理)：**
 
    ```bash
@@ -65,8 +71,11 @@
    sudo systemctl start nginx
    sudo systemctl enable nginx
    ```
+
 ---
+
 #### 1.2 部署静态站点
+
 这是 Astro 的默认模式 (`output: 'static'`)。这种方式最简单，性能最好。
 
 ##### 本地构建
@@ -83,21 +92,21 @@ npm run build
 
 使用 `scp` 或 FTP 工具（如 FileZilla）将 `dist` 文件夹内的**所有内容**上传到服务器。
 
-假设上传路径为 `/var/www/my-astro-site`：
+上传路径为 `/fxk`：
 
 ```bash
 # 在本地终端执行 (示例)
-scp -r dist/* root@你的服务器IP:/var/www/my-astro-site
+scp -r dist/* root@你的服务器IP:/fxk
 ```
 
-*注意：请确保服务器上 `/var/www/my-astro-site` 目录存在且 Nginx 有权限读取。*
+*注意：请确保服务器上 `/fxk`目录存在且 Nginx 有权限读取。*
 
 ##### 配置 Nginx
 
 编辑 Nginx 配置文件：
 
 ```bash
-sudo vi /etc/nginx/conf.d/astro.conf
+sudo vim /etc/nginx/conf.d/astro.conf
 ```
 
 写入以下内容：
@@ -130,6 +139,7 @@ sudo systemctl restart nginx
 ---
 
 ### 2.绑定域名
+
 参考阿里云[添加网站解析](https://help.aliyun.com/zh/dns/pubz-add-website-parsing)和[购买与绑定域名](https://help.aliyun.com/zh/dns/pubz-instance-purchase-and-domain-name-binding)绑定域名并对域名解析加速。
 
 ## 🚀 快速开始
@@ -227,31 +237,35 @@ dashi-website/
 首页采用紧凑精致的设计风格，包含以下区块：
 
 #### 1. Hero 区域
+
 - **Logo展示**
+
   - 圆形容器：80px × 80px
   - 内部缩放：scale(1.5)，实际显示约 120px
   - 浮动动画：6秒循环，轻微上下浮动和旋转
   - 悬停效果：放大 + 旋转
   - 多层阴影：蓝绿渐变光晕效果
-
 - **标题区**
+
   - 主标题：1.75rem，渐变色（蓝→绿）
   - 副标题：0.95rem，灰色
   - 描述文字：0.875rem，深灰色
   - 淡入上升动画
-
 - **行动按钮**
+
   - 两个按钮：浏览博客（主按钮）、查看项目（次按钮）
   - 渐变背景 + 悬停效果
   - 内部光泽动画
 
 #### 2. About Me 区域
+
 - 白色卡片，圆角 12px
 - 个人介绍 + 技能标签
 - 技能标签采用蓝色渐变背景
 - 悬停时标签上浮效果
 
 #### 3. 最新文章区域
+
 - 网格布局，自适应列数
 - 每篇文章包含：
   - 特色图片（160px 高）
@@ -445,16 +459,19 @@ npm run preview
 ### 常见问题
 
 **Q: 图片不显示？**
+
 - 检查图片路径是否正确
 - 确保图片在 `src/assets/` 或 `public/` 目录
 - 使用相对路径引用
 
 **Q: 样式不生效？**
+
 - 检查 CSS 作用域（Astro 默认是 scoped）
 - 全局样式放在 `src/styles/global.css`
 - 使用 `:global()` 包裹全局选择器
 
 **Q: 构建失败？**
+
 - 检查是否有 TypeScript 错误
 - 运行 `npx astro check` 查看详细信息
 - 查看终端错误提示
@@ -464,16 +481,19 @@ npm run preview
 ## 🧰 技术栈
 
 ### 核心框架
+
 - **Astro** (v5.15.5) - 现代化静态站点生成器
 - **TypeScript** - 类型安全
 - **MDX** - 增强的 Markdown 支持
 
 ### 工具库
+
 - **@astrojs/rss** - RSS 订阅功能
 - **@astrojs/sitemap** - 自动生成站点地图
 - **Sharp** - 图片优化
 
 ### 开发体验
+
 - 热重载开发服务器
 - TypeScript 类型检查
 - CSS 模块化和作用域
@@ -483,14 +503,14 @@ npm run preview
 
 ## 📋 命令参考
 
-| 命令 | 说明 |
-|:-----|:-----|
-| `npm install` | 安装依赖 |
-| `npm run dev` | 启动开发服务器 (localhost:4321) |
-| `npm run build` | 构建生产版本到 `./dist/` |
-| `npm run preview` | 本地预览生产构建 |
-| `npx astro check` | 运行类型检查 |
-| `npx astro add [integration]` | 添加 Astro 集成 |
+| 命令                            | 说明                            |
+| :------------------------------ | :------------------------------ |
+| `npm install`                 | 安装依赖                        |
+| `npm run dev`                 | 启动开发服务器 (localhost:4321) |
+| `npm run build`               | 构建生产版本到 `./dist/`      |
+| `npm run preview`             | 本地预览生产构建                |
+| `npx astro check`             | 运行类型检查                    |
+| `npx astro add [integration]` | 添加 Astro 集成                 |
 
 ---
 
@@ -521,5 +541,5 @@ MIT License - 详见 [LICENSE](./LICENSE) 文件
 
 ---
 
-**最后更新：** 2024-11-20  
+**最后更新：** 2024-11-20
 **维护者：** Dashi Team

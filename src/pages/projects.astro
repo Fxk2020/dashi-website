@@ -3,6 +3,7 @@ import { Image } from 'astro:assets';
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
+import FloatingAssistant from '../components/FloatingAssistant.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 import defaultProjectImage from '../assets/blog-placeholder-1.jpg';
 
@@ -16,22 +17,42 @@ const externalProjects = [
 		year: 2021,
 		image: defaultProjectImage,
 	},
+	{
+		title: 'SoftExam-SystemArchitect',
+		description: '本仓库是我个人在2025年上半年成功通过软考系统架构设计师考试的全过程记录与经验总结。',
+		url: 'https://github.com/Fxk2020/SoftExam-SystemArchitect',
+		tags: ['软考', '系统架构师', '备考经验'],
+		year: 2025,
+		image: defaultProjectImage,
+	}
 ];
 
-const externalBlogs = [
+
+// 学术论文数据 - 外部链接
+const papers = [
 	{
-		title: 'Machine Learning Crash Course',
-		description: 'Google’s fast-paced, practical introduction to machine learning, featuring a series of animated videos, interactive visualizations, and hands-on practice exercises.',
-		url: 'https://developers.google.cn/machine-learning/crash-course/prereqs-and-prework?hl=zh-cn',
-		platform: 'GOOGLE',
-		date: 'Nov 2025',
+		title: 'To Store or Not: Online Cost Optimization for Running Big Data Jobs on the Cloud',
+		description: '为了降低云端大数据分析的成本，本文提出了确定性和随机性两种在线算法来动态决策中间数据的存储，并通过理论分析与真实负载实验验证了其显著的成本节约效果。',
+		date: 'July 2024',
+		journal: 'Future Generation Computer Systems',
+		link: 'https://www.sciencedirect.com/science/article/abs/pii/S0167739X24000803',
+		tags: ['在线算法 (Online Algorithms)', '成本优化 (Cost Optimization)', 'hadoop'],
 	},
 	{
-		title: 'Prompt Engineering Guide',
-		description: 'Prompt engineering is the essential discipline of crafting, optimizing, and leveraging prompts—plus related techniques and tools—to safely and effectively harness large language models for everything from question answering and reasoning to domain augmentation and external integrations.',
-		url: 'https://www.promptingguide.ai/zh',
-		platform: 'DAIR.AI',
-		date: 'Nov 2025',
+		title: 'A DRL-based real-time video processing framework in cloud-edge system',
+		description: '为了解决实时视频分析中的延迟与算力限制问题，本文提出了一个名为DeepVA的云边协同框架，通过基于深度强化学习的算法动态决策视频帧的处理位置，从而显著降低了延迟并提升了分析准确率。',
+		date: 'August 2024',
+		journal: 'IEEE Internet of Things Journal',
+		link: 'https://ieeexplore.ieee.org/abstract/document/10659097',
+		tags: ['云边协同 (Cloud-Edge Collaboration)', '视频分析 (Video Analytics)', '深度强化学习 (Deep Reinforcement Learning)'],
+	},
+	{
+		title: 'Caching or Re-Computing: Online Cost Optimization for Running Big Data Tasks in IaaS Cloud',
+		description: '针对云环境下大数据任务中间结果缓存面临的成本权衡与未来需求不可知挑战，本文提出了确定性和随机性两种在线算法，在无需预知未来信息的情况下动态制定缓存决策，并从理论上证明了其竞争比性能，从而有效降低了总成本。',
+		date: 'March 2025',
+		journal: 'Journal of Network and Computer Applications',
+		link: 'https://www.sciencedirect.com/science/article/abs/pii/S1084804524002571',
+		tags: ['在线算法 (Online Algorithms)', '成本优化 (Cost Optimization)', 'hadoop'],
 	},
 ];
 ---
@@ -263,9 +284,9 @@ const externalBlogs = [
 	<body>
 		<Header />
 		<div class="projects-container">
-			<h1 class="page-title">项目与外部内容</h1>
+			<h1 class="page-title">项目与学术成果</h1>
 			<p class="page-description">
-				探索我的开源项目、贡献以及在外部优秀的文章和教程。
+				探索我的开源项目、学术论文与研究成果。
 			</p>
 
 			<section class="section">
@@ -304,25 +325,25 @@ const externalBlogs = [
 			</section>
 
 			<section class="section">
-				<h2 class="section-title">外部优秀内容</h2>
+				<h2 class="section-title">学术论文</h2>
 				<div class="blog-list">
 					{
-						externalBlogs.map((blog) => (
+						papers.map((paper) => (
 							<article class="blog-card">
 								<div class="blog-content">
 									<div class="blog-meta">
-										<span class="blog-platform">{blog.platform}</span>
-										<span class="blog-date">{blog.date}</span>
+										<span class="blog-platform">{paper.journal}</span>
+										<span class="blog-date">{paper.date}</span>
 									</div>
 									<h3 class="blog-title">
-										<a href={blog.url} target="_blank" rel="noopener noreferrer">
-											{blog.title}
+										<a href={paper.link} target="_blank" rel="noopener noreferrer">
+											{paper.title}
 										</a>
 									</h3>
-									<p class="blog-description">{blog.description}</p>
-									{blog.tags && (
+									<p class="blog-description">{paper.description}</p>
+									{paper.tags && (
 										<div class="blog-tags">
-											{blog.tags.map((tag) => (
+											{paper.tags.map((tag) => (
 												<span class="tag">{tag}</span>
 											))}
 										</div>
@@ -336,5 +357,6 @@ const externalBlogs = [
 			</section>
 		</div>
 		<Footer />
+		<FloatingAssistant />
 	</body>
 </html>

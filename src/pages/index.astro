@@ -5,8 +5,10 @@ import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
+import FloatingAssistant from '../components/FloatingAssistant.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 import logoImage from '../assets/logo.png';
+import avatarImage from '../assets/Avatar.jpg';
 
 // Get latest 3 blog posts
 const posts = (await getCollection('blog'))
@@ -180,10 +182,33 @@ const posts = (await getCollection('blog'))
 
 			.about-content {
 				background: white;
-				padding: 1.75rem;
-				border-radius: 12px;
+				padding: 2rem;
+				border-radius: 16px;
 				border: 1px solid rgb(var(--gray-light));
 				box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
+				display: flex;
+				gap: 2rem;
+				align-items: center;
+			}
+
+			.about-avatar {
+				flex-shrink: 0;
+			}
+
+			.avatar-image {
+				width: 150px;
+				height: 150px;
+				border-radius: 50%;
+				object-fit: cover;
+				border: 3px solid rgb(var(--gray-light));
+				box-shadow: 0 4px 20px rgba(37, 99, 235, 0.15);
+				transition: all 0.4s ease;
+			}
+
+			.avatar-image:hover {
+				transform: scale(1.05) rotate(5deg);
+				box-shadow: 0 6px 30px rgba(37, 99, 235, 0.3);
+				border-color: #2563eb;
 			}
 
 			.about-text p {
@@ -348,7 +373,14 @@ const posts = (await getCollection('blog'))
 				}
 
 				.about-content {
+					flex-direction: column;
 					padding: 1.5rem 1.25rem;
+					text-align: center;
+				}
+
+				.avatar-image {
+					width: 120px;
+					height: 120px;
 				}
 
 				.about-text p {
@@ -400,6 +432,11 @@ const posts = (await getCollection('blog'))
 					padding: 1.35rem 1rem;
 				}
 
+				.avatar-image {
+					width: 100px;
+					height: 100px;
+				}
+
 				.section-title {
 					font-size: 1.2rem;
 				}
@@ -436,6 +473,15 @@ const posts = (await getCollection('blog'))
 			<section class="about-section">
 				<h2 class="section-title">About Me</h2>
 				<div class="about-content">
+					<div class="about-avatar">
+						<Image
+							src={avatarImage}
+							alt="Avatar"
+							width={150}
+							height={150}
+							class="avatar-image"
+						/>
+					</div>
 					<div class="about-text">
 						<p>
 							你好！我是一名充满热情的开发者，专注于探索技术的无限可能。就像logo中的山峰和星辰一样，
@@ -500,5 +546,6 @@ const posts = (await getCollection('blog'))
 			}
 		</main>
 		<Footer />
+		<FloatingAssistant />
 	</body>
 </html>

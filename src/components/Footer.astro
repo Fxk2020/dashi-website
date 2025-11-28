@@ -1,4 +1,8 @@
 ---
+import { Image } from 'astro:assets';
+import zhihuLogo from '../assets/知乎.svg';
+import csdnLogo from '../assets/csdn.svg';
+
 const today = new Date();
 ---
 
@@ -18,16 +22,12 @@ const today = new Date();
 			
 			<!-- CSDN -->
 			<a href="https://blog.csdn.net/joey_ro" target="_blank" title="CSDN" class="social-link">
-				<svg viewBox="0 0 24 24" aria-hidden="true" width="20" height="20" fill="currentColor">
-					<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
-				</svg>
+				<Image src={csdnLogo} alt="CSDN" width={20} height={20} class="social-icon" />
 			</a>
 			
 			<!-- 知乎 -->
 			<a href="https://www.zhihu.com/people/ye-lu-da-shi-18-50" target="_blank" title="知乎" class="social-link">
-				<svg viewBox="0 0 24 24" aria-hidden="true" width="20" height="20" fill="currentColor">
-					<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15H8v-7h2v7zm0-8H8V7h2v2zm6 8h-2l-2-3v3h-2v-7h2v3l2-3h2l-2 3.5 2 3.5z"/>
-				</svg>
+				<Image src={zhihuLogo} alt="知乎" width={20} height={20} class="social-icon" />
 			</a>
 		</div>
 	</div>
@@ -76,6 +76,15 @@ const today = new Date();
 		color: #2563eb;
 		background: rgba(37, 99, 235, 0.1);
 		transform: translateY(-2px);
+	}
+
+	.social-icon {
+		display: block;
+		transition: all 0.3s ease;
+	}
+
+	.social-link:hover .social-icon {
+		transform: scale(1.1);
 	}
 
 	@media (max-width: 768px) {

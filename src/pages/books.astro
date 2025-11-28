@@ -1,0 +1,552 @@
+---
+import { getCollection } from 'astro:content';
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import FloatingAssistant from '../components/FloatingAssistant.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import { SITE_TITLE } from '../consts';
+
+// 获取所有读书笔记
+const books = (await getCollection('books')).sort(
+	(a, b) => b.data.readDate.valueOf() - a.data.readDate.valueOf(),
+);
+
+// 按分类分组
+const booksByCategory: Record<string, typeof books> = {};
+books.forEach((book) => {
+	const category = book.data.category || '其他';
+	if (!booksByCategory[category]) {
+		booksByCategory[category] = [];
+	}
+	booksByCategory[category].push(book);
+});
+
+const categories = Object.keys(booksByCategory);
+
+// 统计数据
+const totalBooks = books.length;
+const finishedBooks = books.filter(b => b.data.status === 'finished').length;
+const readingBooks = books.filter(b => b.data.status === 'reading').length;
+---
+
+<!doctype html>
+<html lang="zh">
+	<head>
+		<BaseHead title={`读书笔记 - ${SITE_TITLE}`} description="记录我的阅读旅程和读后感想" />
+		<style>
+			.books-container {
+				max-width: 1200px;
+				margin: 0 auto;
+				padding: 3.5rem 1.5rem;
+			}
+
+			.page-header {
+				text-align: center;
+				margin-bottom: 4rem;
+				animation: fadeInUp 0.6s ease-out;
+			}
+
+			.page-title {
+				font-size: 3.2rem;
+				background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+				-webkit-background-clip: text;
+				-webkit-text-fill-color: transparent;
+				background-clip: text;
+				margin-bottom: 1rem;
+				font-weight: 800;
+				letter-spacing: -0.02em;
+			}
+
+			.page-subtitle {
+				font-size: 1.15rem;
+				color: rgb(var(--gray));
+				max-width: 600px;
+				margin: 0 auto;
+				line-height: 1.7;
+				font-weight: 400;
+			}
+
+			/* 统计卡片 */
+			.stats-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+				gap: 1.5rem;
+				margin-bottom: 4rem;
+			}
+
+			.stat-card {
+				background: linear-gradient(135deg, rgba(240, 147, 251, 0.08) 0%, rgba(245, 87, 108, 0.08) 100%);
+				padding: 2rem 1.5rem;
+				border-radius: 20px;
+				text-align: center;
+				transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+				border: 2px solid rgba(240, 147, 251, 0.15);
+				position: relative;
+				overflow: hidden;
+			}
+
+			.stat-card::before {
+				content: '';
+				position: absolute;
+				top: -50%;
+				left: -50%;
+				width: 200%;
+				height: 200%;
+				background: radial-gradient(circle, rgba(240, 147, 251, 0.1) 0%, transparent 70%);
+				opacity: 0;
+				transition: opacity 0.4s ease;
+			}
+
+			.stat-card:hover::before {
+				opacity: 1;
+			}
+
+			.stat-card:hover {
+				transform: translateY(-8px) scale(1.02);
+				border-color: rgba(240, 147, 251, 0.3);
+				box-shadow: 0 12px 40px rgba(240, 147, 251, 0.15);
+			}
+
+			.stat-number {
+				font-size: 3rem;
+				font-weight: 800;
+				background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+				-webkit-background-clip: text;
+				-webkit-text-fill-color: transparent;
+				background-clip: text;
+				margin-bottom: 0.5rem;
+				position: relative;
+			}
+
+			.stat-label {
+				color: rgb(var(--gray-dark));
+				font-size: 1rem;
+				font-weight: 600;
+				letter-spacing: 0.05em;
+			}
+
+			/* 分类导航 */
+			.category-nav {
+				display: flex;
+				gap: 1rem;
+				margin-bottom: 3rem;
+				flex-wrap: wrap;
+				justify-content: center;
+			}
+
+			.category-btn {
+				padding: 0.75rem 2rem;
+				border-radius: 50px;
+				background: white;
+				border: 2px solid rgba(240, 147, 251, 0.2);
+				color: rgb(var(--gray-dark));
+				cursor: pointer;
+				transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+				font-weight: 600;
+				font-size: 0.95rem;
+				box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+			}
+
+			.category-btn:hover {
+				border-color: #f093fb;
+				color: #f093fb;
+				transform: translateY(-3px);
+				box-shadow: 0 6px 20px rgba(240, 147, 251, 0.2);
+			}
+
+			.category-btn.active {
+				background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+				border-color: transparent;
+				color: white;
+				box-shadow: 0 8px 24px rgba(240, 147, 251, 0.3);
+			}
+
+			/* 书籍网格 */
+			.books-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+				gap: 2.5rem;
+				margin-bottom: 4rem;
+			}
+
+			.book-card {
+				background: white;
+				border-radius: 24px;
+				overflow: hidden;
+				box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+				transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+				border: 2px solid rgba(0, 0, 0, 0.04);
+				display: flex;
+				flex-direction: column;
+				height: 100%;
+			}
+
+			.book-card:hover {
+				transform: translateY(-12px);
+				box-shadow: 0 20px 48px rgba(240, 147, 251, 0.15);
+				border-color: rgba(240, 147, 251, 0.2);
+			}
+
+			.book-header {
+				padding: 2rem;
+				background: linear-gradient(135deg, rgba(240, 147, 251, 0.08) 0%, rgba(245, 87, 108, 0.08) 100%);
+				position: relative;
+			}
+
+			.book-status {
+				position: absolute;
+				top: 1.5rem;
+				right: 1.5rem;
+				padding: 0.5rem 1rem;
+				border-radius: 50px;
+				font-size: 0.8rem;
+				font-weight: 700;
+				backdrop-filter: blur(10px);
+				letter-spacing: 0.05em;
+			}
+
+			.status-finished {
+				background: rgba(52, 211, 153, 0.9);
+				color: white;
+			}
+
+			.status-reading {
+				background: rgba(96, 165, 250, 0.9);
+				color: white;
+			}
+
+			.book-icon {
+				font-size: 3.5rem;
+				margin-bottom: 1rem;
+				display: block;
+			}
+
+			.book-title {
+				font-size: 1.5rem;
+				font-weight: 700;
+				margin-bottom: 0.5rem;
+				color: rgb(var(--black));
+				line-height: 1.3;
+			}
+
+			.book-author {
+				color: rgb(var(--gray));
+				font-size: 1rem;
+				margin-bottom: 1rem;
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+				font-weight: 500;
+			}
+
+			.book-rating {
+				display: flex;
+				gap: 0.3rem;
+				margin-bottom: 0.5rem;
+			}
+
+			.star {
+				color: #fbbf24;
+				font-size: 1.1rem;
+			}
+
+			.star.empty {
+				color: rgba(0, 0, 0, 0.1);
+			}
+
+			.book-content {
+				padding: 2rem;
+				flex: 1;
+				display: flex;
+				flex-direction: column;
+			}
+
+			.book-summary {
+				color: rgb(var(--gray-dark));
+				font-size: 0.95rem;
+				line-height: 1.7;
+				margin-bottom: 1.5rem;
+				font-weight: 500;
+			}
+
+			.thoughts-section {
+				margin-top: auto;
+				padding-top: 1.5rem;
+				border-top: 2px solid rgba(240, 147, 251, 0.1);
+			}
+
+			.thoughts-title {
+				font-size: 0.9rem;
+				font-weight: 700;
+				color: #f5576c;
+				margin-bottom: 0.8rem;
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+				letter-spacing: 0.05em;
+			}
+
+			.book-thoughts {
+				color: rgb(var(--gray-dark));
+				font-size: 0.9rem;
+				line-height: 1.8;
+				white-space: pre-line;
+				max-height: 240px;
+				overflow-y: auto;
+				padding-right: 0.5rem;
+			}
+
+			.book-thoughts::-webkit-scrollbar {
+				width: 4px;
+			}
+
+			.book-thoughts::-webkit-scrollbar-track {
+				background: rgba(0, 0, 0, 0.05);
+				border-radius: 2px;
+			}
+
+			.book-thoughts::-webkit-scrollbar-thumb {
+				background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+				border-radius: 2px;
+			}
+
+			.book-meta {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				padding-top: 1.5rem;
+				margin-top: 1.5rem;
+				border-top: 2px solid rgba(0, 0, 0, 0.05);
+			}
+
+			.book-date {
+				color: rgb(var(--gray));
+				font-size: 0.85rem;
+				font-weight: 600;
+			}
+
+			.book-tags {
+				display: flex;
+				gap: 0.6rem;
+				flex-wrap: wrap;
+			}
+
+			.tag {
+				padding: 0.4rem 1rem;
+				background: linear-gradient(135deg, rgba(240, 147, 251, 0.1) 0%, rgba(245, 87, 108, 0.1) 100%);
+				color: #f5576c;
+				border-radius: 50px;
+				font-size: 0.8rem;
+				font-weight: 600;
+				border: 1px solid rgba(245, 87, 108, 0.2);
+				transition: all 0.3s ease;
+			}
+
+			.tag:hover {
+				background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+				color: white;
+				transform: translateY(-2px);
+				box-shadow: 0 4px 12px rgba(245, 87, 108, 0.3);
+			}
+
+			/* 动画 */
+			@keyframes fadeInUp {
+				from {
+					opacity: 0;
+					transform: translateY(30px);
+				}
+				to {
+					opacity: 1;
+					transform: translateY(0);
+				}
+			}
+
+			.category-section {
+				margin-bottom: 5rem;
+			}
+
+			.category-title {
+				font-size: 2rem;
+				font-weight: 700;
+				margin-bottom: 2rem;
+				color: rgb(var(--black));
+				display: flex;
+				align-items: center;
+				gap: 1rem;
+			}
+
+			.category-title::before {
+				content: '';
+				width: 5px;
+				height: 36px;
+				background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+				border-radius: 3px;
+			}
+
+			/* 响应式 */
+			@media (max-width: 768px) {
+				.books-container {
+					padding: 2.5rem 1rem;
+				}
+
+				.page-title {
+					font-size: 2.2rem;
+				}
+
+				.books-grid {
+					grid-template-columns: 1fr;
+					gap: 2rem;
+				}
+
+				.stats-grid {
+					grid-template-columns: repeat(3, 1fr);
+					gap: 1rem;
+				}
+
+				.stat-card {
+					padding: 1.5rem 1rem;
+				}
+
+				.stat-number {
+					font-size: 2.2rem;
+				}
+
+				.stat-label {
+					font-size: 0.85rem;
+				}
+
+				.book-thoughts {
+					max-height: 180px;
+				}
+			}
+
+			@media (max-width: 480px) {
+				.stats-grid {
+					grid-template-columns: 1fr;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<Header />
+		<main class="books-container">
+			<div class="page-header">
+				<h1 class="page-title">📚 读书笔记</h1>
+				<p class="page-subtitle">记录阅读旅程，分享思想火花。好书如益友，读书如品茗。</p>
+			</div>
+
+			<!-- 统计卡片 -->
+			<div class="stats-grid">
+				<div class="stat-card">
+					<div class="stat-number">{totalBooks}</div>
+					<div class="stat-label">已记录书籍</div>
+				</div>
+				<div class="stat-card">
+					<div class="stat-number">{finishedBooks}</div>
+					<div class="stat-label">已读完</div>
+				</div>
+				<div class="stat-card">
+					<div class="stat-number">{readingBooks}</div>
+					<div class="stat-label">在读中</div>
+				</div>
+			</div>
+
+			<!-- 分类导航 -->
+			<div class="category-nav">
+				<button class="category-btn active" data-category="all">全部书籍</button>
+				{categories.map(category => (
+					<button class="category-btn" data-category={category}>
+						{category} ({booksByCategory[category].length})
+					</button>
+				))}
+			</div>
+
+			<!-- 书籍列表 -->
+			{categories.map(category => (
+				<div class="category-section" data-section={category}>
+					<h2 class="category-title">{category}</h2>
+					<div class="books-grid">
+						{booksByCategory[category].map((book) => (
+							<article class="book-card">
+								<div class="book-header">
+									{book.data.status === 'finished' && (
+										<span class="book-status status-finished">已读完</span>
+									)}
+									{book.data.status === 'reading' && (
+										<span class="book-status status-reading">在读中</span>
+									)}
+									<span class="book-icon">📖</span>
+									<h3 class="book-title">{book.data.title}</h3>
+									<div class="book-author">
+										<span>✍️</span>
+										<span>{book.data.author}</span>
+									</div>
+									{book.data.rating && (
+										<div class="book-rating">
+											{Array.from({ length: 5 }, (_, i) => (
+												<span class={i < book.data.rating! ? 'star' : 'star empty'}>★</span>
+											))}
+										</div>
+									)}
+								</div>
+								<div class="book-content">
+									<p class="book-summary">{book.data.summary}</p>
+									
+									<div class="thoughts-section">
+										<div class="thoughts-title">
+											<span>💭</span>
+											<span>读后感想</span>
+										</div>
+										<div class="book-thoughts">{book.data.thoughts}</div>
+									</div>
+
+									<div class="book-meta">
+										<div class="book-date">
+											<FormattedDate date={book.data.readDate} />
+										</div>
+										{book.data.tags && book.data.tags.length > 0 && (
+											<div class="book-tags">
+												{book.data.tags.slice(0, 2).map((tag) => (
+													<span class="tag">{tag}</span>
+												))}
+											</div>
+										)}
+									</div>
+								</div>
+							</article>
+						))}
+					</div>
+				</div>
+			))}
+		</main>
+		<Footer />
+		<FloatingAssistant />
+
+		<script>
+			// 分类筛选
+			const categoryBtns = document.querySelectorAll('.category-btn');
+			const categorySections = document.querySelectorAll('.category-section');
+
+			categoryBtns.forEach(btn => {
+				btn.addEventListener('click', () => {
+					const category = (btn as HTMLElement).dataset.category;
+					
+					// 更新按钮状态
+					categoryBtns.forEach(b => b.classList.remove('active'));
+					btn.classList.add('active');
+					
+					// 显示/隐藏分类
+					categorySections.forEach(section => {
+						const sectionCategory = (section as HTMLElement).dataset.section;
+						if (category === 'all' || sectionCategory === category) {
+							(section as HTMLElement).style.display = 'block';
+						} else {
+							(section as HTMLElement).style.display = 'none';
+						}
+					});
+				});
+			});
+		</script>
+	</body>
+</html>
